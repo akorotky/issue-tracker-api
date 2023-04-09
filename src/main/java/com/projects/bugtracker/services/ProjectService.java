@@ -1,17 +1,29 @@
 package com.projects.bugtracker.services;
 
-import com.projects.bugtracker.models.Project;
+import com.projects.bugtracker.dto.ProjectDto;
+import com.projects.bugtracker.dto.UserDto;
+import com.projects.bugtracker.entities.User;
 
 import java.util.List;
 
 public interface ProjectService {
 
-    List<Project> findAll();
+    ProjectDto findProjectById(Long id);
 
-    Project findById(Long id);
+    List<ProjectDto> findAllProjects();
 
-    void createOrUpdate(Project project);
+    List<ProjectDto> findAllProjectsByOwner(String username);
 
-    void deleteById(Long id);
+    void createProject(ProjectDto projectDto, User user);
+
+    void updateProject(ProjectDto projectDto, Long projectId);
+
+    void deleteProjectById(Long id);
+
+    List<UserDto> getProjectCollaborators(Long projectId);
+
+    void addProjectCollaborator(Long projectId, String username);
+
+    void removeProjectCollaborator(Long projectId, String username);
 
 }

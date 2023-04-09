@@ -1,16 +1,21 @@
 package com.projects.bugtracker.services;
 
-import com.projects.bugtracker.models.Bug;
+import com.projects.bugtracker.dto.BugDto;
+import com.projects.bugtracker.entities.User;
 
 import java.util.List;
 
 public interface BugService {
 
-    List<Bug> findAll();
+    BugDto findBugById(Long id);
 
-    Bug findById(Long id);
+    List<BugDto> findAllBugs();
 
-    void createOrUpdate(Bug bug);
+    List<BugDto> findAllBugsByProject(Long projectId);
 
-    void deleteById(Long id);
+    void createBug(BugDto bugDto, User user);
+
+    void updateBug(BugDto bugDto);
+
+    void deleteBugById(Long id);
 }

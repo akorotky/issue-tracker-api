@@ -1,15 +1,19 @@
 package com.projects.bugtracker.services;
 
-import com.projects.bugtracker.models.BugComment;
+import com.projects.bugtracker.dto.BugCommentDto;
+import com.projects.bugtracker.dto.UserDto;
 
 import java.util.List;
 
 public interface BugCommentService {
-    List<BugComment> findAll();
 
-    BugComment findById(Long id);
+    List<BugCommentDto> findAllBugComments();
 
-    void createOrUpdate(BugComment bug);
+    BugCommentDto findBugCommentById(Long id);
 
-    void deleteById(Long id);
+    void createBugComment(BugCommentDto bugCommentDto, UserDto userDto);
+
+    void updateBugComment(BugCommentDto bugCommentDto);
+
+    void deleteBugCommentById(Long id);
 }
