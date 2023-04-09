@@ -3,18 +3,24 @@ DROP TABLE IF EXISTS project CASCADE;
 DROP TABLE IF EXISTS project_user CASCADE;
 DROP TABLE IF EXISTS bug CASCADE;
 DROP TABLE IF EXISTS bug_comment CASCADE;
+DROP TABLE IF EXISTS role CASCADE;
+DROP TABLE IF EXISTS user_role CASCADE;
 
 CREATE TABLE "user" (
     id BIGSERIAL,
     username varchar(255) NOT NULL,
     password varchar(255) NOT NULL,
     email varchar(255) NOT NULL,
+    account_locked BOOLEAN,
+    account_enabled BOOLEAN,
+    account_expired BOOLEAN,
+    credentials_expired BOOLEAN,
     CONSTRAINT user_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE project (
     id BIGSERIAL,
-    description varchar(255) NOT NULL,
+    description TEXT NOT NULL,
     title varchar(255) NOT NULL,
     user_id BIGINT NOT NULL,
     CONSTRAINT project_pkey PRIMARY KEY (id),
@@ -34,7 +40,7 @@ CREATE TABLE project_user (
 CREATE TABLE bug (
     id BIGSERIAL,
     title varchar(255) NOT NULL,
-    description varchar(255),
+    description TEXT,
     user_id BIGINT NOT NULL,
     project_id BIGINT NOT NULL,
     CONSTRAINT bug_pkey PRIMARY KEY (id),
@@ -44,7 +50,7 @@ CREATE TABLE bug (
 
 CREATE TABLE bug_comment (
     id BIGSERIAL,
-    body varchar(255) NOT NULL,
+    body TEXT NOT NULL,
     user_id BIGINT NOT NULL,
     bug_id BIGINT NOT NULL,
     CONSTRAINT bug_comment_pkey PRIMARY KEY (id),
@@ -52,5 +58,20 @@ CREATE TABLE bug_comment (
     CONSTRAINT fk_bug FOREIGN KEY (bug_id) REFERENCES bug(id)
 );
 
+CREATE TABLE role (
+    id BIGSERIAL,
+    name varchar(255) NOT NULL,
+    CONSTRAINT role_pkey PRIMARY KEY (id)
+);
 
+CREATE TABLE user_role (
+    id BIGSERIAL,
+    user_id BIGINT NOT NULL,
+    role_id BIGINT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES "user"(id),
+    FOREIGN KEY (role_id) REFERENCES role(id),
+    CONSTRAINT role_user_pkey PRIMARY KEY (role_id, user_id),
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES "user"(id),
+    CONSTRAINT fk_role FOREIGN KEY (role_id) REFERENCES role(id)
+);
 
