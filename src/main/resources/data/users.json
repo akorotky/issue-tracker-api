@@ -1,0 +1,62 @@
+[
+  {
+    "username": "user",
+    "password": "password",
+    "email": "user@bugtracker.test",
+    "roles": []
+  },
+  {
+    "username": "lex",
+    "password": "lex12345",
+    "email": "lex@bugtracker.test",
+    "roles": []
+  },
+  {
+    "username": "bob",
+    "password": "bob12345",
+    "email": "bob@bugtracker.test",
+    "roles": []
+  },
+  {
+    "username": "tom",
+    "password": "tom12345",
+    "email": "tom@bugtracker.test",
+    "roles": []
+  },
+  {
+    "username": "smith",
+    "password": "smith12345",
+    "email": "smith@bugtracker.test",
+    "roles": []
+  },
+  {
+    "username": "jack",
+    "password": "jack12345",
+    "email": "jack@bugtracker.test",
+    "roles": []
+  },
+  {
+    "username": "john",
+    "password": "john12345",
+    "email": "john@bugtracker.test",
+    "roles": []
+  },
+  {
+    "username": "jim",
+    "password": "jim12345",
+    "email": "jim@bugtracker.test",
+    "roles": []
+  },
+  {
+    "username": "joe",
+    "password": "joe12345",
+    "email": "user@bugtracker.test",
+    "roles": []
+  },
+  {
+    "username": "sam",
+    "password": "sam12345",
+    "email": "sam@bugtracker.test",
+    "roles": []
+  }
+]

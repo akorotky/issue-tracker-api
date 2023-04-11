@@ -1,40 +1,72 @@
 package com.projects.bugtracker.db;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.projects.bugtracker.dto.ProjectDto;
 import com.projects.bugtracker.dto.UserDto;
 import com.projects.bugtracker.entities.Role;
 import com.projects.bugtracker.constants.RoleType;
+import com.projects.bugtracker.entities.User;
+import com.projects.bugtracker.exceptions.ResourceNotFoundException;
 import com.projects.bugtracker.repositories.RoleRepository;
+import com.projects.bugtracker.repositories.UserRepository;
+import com.projects.bugtracker.services.ProjectService;
 import com.projects.bugtracker.services.UserService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
+import java.io.File;
+import java.util.List;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class DatabaseLoader implements CommandLineRunner {
 
     private final UserService userService;
     private final RoleRepository roleRepository;
+    private final ProjectService projectService;
+    private final UserRepository userRepository;
 
     @Override
     public void run(String... strings) throws Exception {
-        String[] usernames = {"user", "lex", "bob", "tom", "smith", "jack", "john", "jim"};
-        String[] passwords = {"password", "lex12345", "bob12345", "tom12345", "smith12345", "jack12345", "john12345", "jim12345"};
-        String[] emails = {"user@bugtracker.test", "lex@bugtracker.test", "bob@bugtracker.test", "tom@bugtracker.test",
-                "smith@bugtracker.test", "jack@bugtracker.test", "john@bugtracker.test", "jim@bugtracker.test"};
+        // json data file locations
+        String PROJECTS_DATA_LOCATION = "src/main/resources/data/projects.json";
+        String USERS_DATA_LOCATION = "src/main/resources/data/users.json";
 
+        // Jackson object mapper
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // load data from the json files into DTOs
+        List<ProjectDto> projectList = objectMapper.readValue(
+                new File(PROJECTS_DATA_LOCATION),
+                new TypeReference<List<ProjectDto>>() {
+                });
+
+        List<UserDto> userList = objectMapper.readValue(
+                new File(USERS_DATA_LOCATION),
+                new TypeReference<List<UserDto>>() {
+                });
+
+        // create roles
         RoleType[] roles = {RoleType.USER, RoleType.ADMIN};
 
+        // save roles to the database
         for (RoleType role : roles) {
             roleRepository.save(new Role(role));
         }
 
-        for (int i = 0; i < usernames.length; i++) {
-            UserDto user = new UserDto(null, usernames[i], passwords[i], emails[i], new HashSet<>());
+        for (int i = 0; i < userList.size(); i++) {
+            // create a new user
+            userService.createUser(userList.get(i));
 
-            userService.createUser(user);
+            // load the user from the database
+            String username = userList.get(i).username();
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+
+            // create a new project with the selected user as owner
+            projectService.createProject(projectList.get(i), user);
         }
     }
 }
