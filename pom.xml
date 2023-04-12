@@ -8,11 +8,11 @@
         <version>3.0.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.projects</groupId>
-    <artifactId>bugtracker</artifactId>
+    <groupId>com.bugtracker</groupId>
+    <artifactId>bugtracker-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>bugtracker</name>
-    <description>A web application for managing and keeping track of code bugs</description>
+    <name>bugtrackerAPI</name>
+    <description>A REST API for the bugtracker project</description>
     <properties>
         <java.version>19</java.version>
     </properties>
