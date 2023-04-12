@@ -10,7 +10,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 public class RegistrationController {
 
-    @GetMapping("registration")
+    @GetMapping("api/registration")
     public RepresentationModel<?> register() {
 
         return new RepresentationModel<>().add(

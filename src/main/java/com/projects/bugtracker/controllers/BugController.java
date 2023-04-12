@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("bugs")
+@RequestMapping("api/bugs")
 public class BugController {
     private final BugService bugService;
     @GetMapping
