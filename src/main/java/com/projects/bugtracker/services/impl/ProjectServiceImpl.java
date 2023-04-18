@@ -1,10 +1,7 @@
 package com.projects.bugtracker.services.impl;
 
-import com.projects.bugtracker.dto.ProjectDto;
-import com.projects.bugtracker.dto.ProjectMapper;
+import com.projects.bugtracker.dto.*;
 import com.projects.bugtracker.exceptions.ResourceNotFoundException;
-import com.projects.bugtracker.dto.UserDto;
-import com.projects.bugtracker.dto.UserMapper;
 import com.projects.bugtracker.entities.Project;
 import com.projects.bugtracker.entities.User;
 import com.projects.bugtracker.repositories.ProjectRepository;
@@ -29,9 +26,23 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectDto> findAllProjectsByOwner(String username) {
-        User user = userRepository.findByUsername(username)
+        User owner = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-        return projectRepository.findAllByOwner(user).stream().map(ProjectMapper::toDto).toList();
+        return projectRepository.findByOwner_Username(username).stream().map(ProjectMapper::toDto).toList();
+    }
+
+    @Override
+    public List<ProjectDto> findAllProjectsByCollaborator(String username) {
+        User collaborator = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+        return projectRepository.findByCollaborators_Username(username).stream().map(ProjectMapper::toDto).toList();
+    }
+
+    @Override
+    public List<BugDto> findAllBugs(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project", "id", projectId));
+        return project.getBugs().stream().map(BugMapper::toDto).toList();
     }
 
     @Override

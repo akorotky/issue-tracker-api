@@ -1,5 +1,6 @@
 package com.projects.bugtracker.assemblers;
 
+import com.projects.bugtracker.controllers.ProjectController;
 import com.projects.bugtracker.controllers.UserController;
 import com.projects.bugtracker.dto.UserDto;
 import lombok.NonNull;
@@ -19,7 +20,7 @@ public class UserModelAssembler implements RepresentationModelAssembler<UserDto,
 
         return EntityModel.of(userDto,
                 linkTo(methodOn(UserController.class).getUser(username)).withSelfRel(),
-                linkTo(methodOn(UserController.class).getOwnedProjects(username)).withRel("owned-projects"),
-                linkTo(methodOn(UserController.class).getSharedProjects(username)).withRel("shared-projects"));
+                linkTo(methodOn(ProjectController.class).getAllProjects(username, null)).withRel("owned-projects").expand(),
+                linkTo(methodOn(ProjectController.class).getAllProjects(null, username)).withRel("shared-projects").expand());
     }
 }

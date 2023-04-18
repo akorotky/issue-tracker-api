@@ -1,5 +1,6 @@
 package com.projects.bugtracker.services;
 
+import com.projects.bugtracker.dto.BugDto;
 import com.projects.bugtracker.dto.ProjectDto;
 import com.projects.bugtracker.dto.UserDto;
 import com.projects.bugtracker.entities.User;
@@ -13,6 +14,10 @@ public interface ProjectService {
     List<ProjectDto> findAllProjects();
 
     List<ProjectDto> findAllProjectsByOwner(String username);
+
+    List<ProjectDto> findAllProjectsByCollaborator(String username);
+
+    List<BugDto> findAllBugs(Long projectId);
 
     void createProject(ProjectDto projectDto, User user);
 

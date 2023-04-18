@@ -26,7 +26,7 @@ public class Project {
     @Column(name = "description")
     private String description;
 
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Bug> bugs = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)

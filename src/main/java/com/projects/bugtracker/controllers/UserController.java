@@ -12,7 +12,6 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -24,13 +23,12 @@ public class UserController {
 
     private final UserServiceImpl userService;
     private final UserModelAssembler userAssembler;
-    private final ProjectModelAssembler projectAssembler;
 
     @GetMapping
     public CollectionModel<EntityModel<UserDto>> getAllUsers() {
         List<EntityModel<UserDto>> users = userService.findAllUsers().stream()
                 .map(userAssembler::toModel)
-                .collect(Collectors.toList());
+                .toList();
 
         return CollectionModel.of(users, linkTo(methodOn(UserController.class).getAllUsers()).withSelfRel());
     }
@@ -49,22 +47,5 @@ public class UserController {
     @DeleteMapping("{username}")
     public void deleteUser(@PathVariable String username) {
         userService.deleteUserByUsername(username);
-    }
-
-    @GetMapping("{username}/owned-projects")
-    public CollectionModel<EntityModel<ProjectDto>> getOwnedProjects(@PathVariable String username) {
-        List<EntityModel<ProjectDto>> projects = userService.getOwnedProjects(username).stream()
-                .map(projectAssembler::toModel)
-                .toList();
-        return CollectionModel.of(projects, linkTo(methodOn(UserController.class).getOwnedProjects(username)).withSelfRel());
-    }
-
-    @GetMapping("{username}/shared-projects")
-    public CollectionModel<EntityModel<ProjectDto>> getSharedProjects(@PathVariable String username) {
-        List<EntityModel<ProjectDto>> projects = userService.getSharedProjects(username).stream()
-                .map(projectAssembler::toModel)
-                .toList();
-
-        return CollectionModel.of(projects, linkTo(methodOn(UserController.class).getSharedProjects(username)).withSelfRel());
     }
 }

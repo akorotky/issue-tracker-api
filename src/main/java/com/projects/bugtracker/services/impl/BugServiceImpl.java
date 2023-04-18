@@ -1,10 +1,13 @@
 package com.projects.bugtracker.services.impl;
 
+import com.projects.bugtracker.entities.Bug;
+import com.projects.bugtracker.entities.Project;
 import com.projects.bugtracker.entities.User;
 import com.projects.bugtracker.exceptions.ResourceNotFoundException;
 import com.projects.bugtracker.dto.BugDto;
 import com.projects.bugtracker.dto.BugMapper;
 import com.projects.bugtracker.repositories.BugRepository;
+import com.projects.bugtracker.repositories.ProjectRepository;
 import com.projects.bugtracker.services.BugService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,7 @@ import java.util.List;
 public class BugServiceImpl implements BugService {
 
     private final BugRepository bugRepo;
+    private final ProjectRepository projectRepo;
 
     @Override
     public List<BugDto> findAllBugs() {
@@ -24,12 +28,19 @@ public class BugServiceImpl implements BugService {
 
     @Override
     public List<BugDto> findAllBugsByProject(Long projectId) {
-        return null;
+        Project project = projectRepo.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project", "id", projectId));
+        return bugRepo.findAllByProject(project).stream().map(BugMapper::toDto).toList();
     }
 
     @Override
     public void createBug(BugDto bugDto, User user) {
-        bugRepo.save(BugMapper.toBug(bugDto));
+        Project project = projectRepo.findById(bugDto.projectId())
+                .orElseThrow(() -> new ResourceNotFoundException("Project", "id", bugDto.projectId()));
+        Bug bug = BugMapper.toBug(bugDto);
+        bug.setProject(project);
+        bug.setAuthor(user);
+        bugRepo.save(bug);
     }
 
     @Override

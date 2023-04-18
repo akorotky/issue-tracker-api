@@ -10,7 +10,8 @@ public class BugMapper {
                 bug.getId(),
                 bug.getTitle(),
                 bug.getDescription(),
-                UserMapper.toDto(bug.getAuthor()));
+                UserMapper.toDto(bug.getAuthor()),
+                bug.getProject().getId());
     }
 
     public static Bug toBug(BugDto bugDto) {

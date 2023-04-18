@@ -34,7 +34,7 @@ public class Bug {
     @JoinColumn(name = "project_id", nullable = false, updatable = false)
     private Project project;
 
-    @OneToMany(mappedBy = "bug", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "bug", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<BugComment> comments = new HashSet<>();
 
     @Override

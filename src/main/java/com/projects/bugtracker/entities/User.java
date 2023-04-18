@@ -53,6 +53,9 @@ public class User {
     @ManyToMany(mappedBy = "collaborators", fetch = FetchType.LAZY)
     private Set<Project> sharedProjects = new HashSet<>();
 
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<Bug> bugs = new HashSet<>();
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

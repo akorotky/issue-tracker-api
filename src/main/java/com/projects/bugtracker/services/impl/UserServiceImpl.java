@@ -2,6 +2,7 @@ package com.projects.bugtracker.services.impl;
 
 import com.projects.bugtracker.dto.ProjectDto;
 import com.projects.bugtracker.dto.ProjectMapper;
+import com.projects.bugtracker.entities.Bug;
 import com.projects.bugtracker.entities.Project;
 import com.projects.bugtracker.entities.Role;
 import com.projects.bugtracker.constants.RoleType;
@@ -100,6 +101,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         for (Project project : user.getSharedProjects()) {
             project.removeCollaborator(user);
+        }
+
+        for (Bug bug : user.getBugs()) {
+            bug.setAuthor(null);
         }
 
         userRepo.deleteByUsername(username);
