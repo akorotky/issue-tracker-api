@@ -5,6 +5,7 @@ import com.projects.bugtracker.controllers.ProjectController;
 import com.projects.bugtracker.controllers.UserController;
 import com.projects.bugtracker.dto.BugDto;
 import lombok.NonNull;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,6 @@ public class BugModelAssembler implements RepresentationModelAssembler<BugDto, E
                 linkTo(methodOn(BugController.class).getBug(bugId)).withSelfRel(),
                 linkTo(methodOn(UserController.class).getUser(username)).withRel("author"),
                 linkTo(methodOn(ProjectController.class).getProject(projectId)).withRel("project"),
-                linkTo(methodOn(BugController.class).getAllBugs(null)).withRel("bugs").expand());
+                linkTo(methodOn(ProjectController.class).getAllBugs(projectId, Pageable.unpaged())).withRel("bugs").expand());
     }
 }

@@ -7,15 +7,13 @@ import com.projects.bugtracker.security.UserPrincipal;
 import com.projects.bugtracker.services.BugService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,26 +21,20 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class BugController {
 
     private final BugService bugService;
-    private final BugModelAssembler bugAssembler;
+    private final BugModelAssembler bugModelAssembler;
+    private final PagedResourcesAssembler<BugDto> pagedResourcesAssembler;
 
     @GetMapping
-    public CollectionModel<EntityModel<BugDto>> getAllBugs(@RequestParam(name = "project", required = false) Long projectId) {
-        List<BugDto> bugs = new ArrayList<>();
+    public CollectionModel<EntityModel<BugDto>> getBugsPage(@PageableDefault(page = 0, size = 15) Pageable pageable) {
+        Page<BugDto> bugsPage = bugService.findAllBugs(pageable);
+        return pagedResourcesAssembler.toModel(bugsPage, bugModelAssembler);
 
-        if (projectId != null) bugs.addAll(bugService.findAllBugsByProject(projectId));
-        else bugs.addAll(bugService.findAllBugs());
-
-        List<EntityModel<BugDto>> bugModels = bugs.stream()
-                .map(bugAssembler::toModel)
-                .toList();
-
-        return CollectionModel.of(bugModels, linkTo(methodOn(BugController.class).getAllBugs(projectId)).withSelfRel().expand());
     }
 
     @GetMapping("{bugId}")
     public EntityModel<BugDto> getBug(@PathVariable Long bugId) {
         BugDto bug = bugService.findBugById(bugId);
-        return bugAssembler.toModel(bug);
+        return bugModelAssembler.toModel(bug);
     }
 
     @PostMapping

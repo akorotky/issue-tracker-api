@@ -8,14 +8,17 @@ import com.projects.bugtracker.assemblers.UserModelAssembler;
 import com.projects.bugtracker.dto.UserDto;
 import com.projects.bugtracker.security.CurrentUser;
 import com.projects.bugtracker.security.UserPrincipal;
-import com.projects.bugtracker.services.BugService;
 import com.projects.bugtracker.services.ProjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -27,31 +30,30 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class ProjectController {
 
     private final ProjectService projectService;
-    private final ProjectModelAssembler projectAssembler;
+    private final ProjectModelAssembler projectModelAssembler;
     private final UserModelAssembler userAssembler;
-    private final BugModelAssembler bugAssembler;
+    private final BugModelAssembler bugModelAssembler;
+    private final PagedResourcesAssembler<ProjectDto> pagedProjectResourcesAssembler;
+    private final PagedResourcesAssembler<BugDto> pagedBugResourcesAssembler;
 
     @GetMapping
-    public CollectionModel<EntityModel<ProjectDto>> getAllProjects(
+    public PagedModel<EntityModel<ProjectDto>> getProjectsPage(
             @RequestParam(required = false) String owner,
-            @RequestParam(required = false) String collaborator) {
+            @RequestParam(required = false) String collaborator,
+            @PageableDefault(page = 0, size = 20) Pageable pageable) {
+        Page<ProjectDto> projectsPage;
 
-        List<ProjectDto> projects = new ArrayList<>();
-        if (owner == null && collaborator == null) projects.addAll(projectService.findAllProjects());
-        else if (owner != null) projects.addAll(projectService.findAllProjectsByOwner(owner));
-        else projects.addAll(projectService.findAllProjectsByCollaborator(collaborator));
+        if (owner == null && collaborator == null) projectsPage = projectService.findAllProjects(pageable);
+        else if (owner != null) projectsPage = projectService.findAllProjectsByOwner(owner, pageable);
+        else projectsPage = projectService.findAllProjectsByCollaborator(collaborator, pageable);
 
-        List<EntityModel<ProjectDto>> projectModels = projects.stream()
-                .map(projectAssembler::toModel)
-                .toList();
-
-        return CollectionModel.of(projectModels, linkTo(methodOn(ProjectController.class).getAllProjects(owner, collaborator)).withSelfRel().expand());
+        return pagedProjectResourcesAssembler.toModel(projectsPage, projectModelAssembler);
     }
 
     @GetMapping("{projectId}")
     public EntityModel<ProjectDto> getProject(@PathVariable Long projectId) {
         ProjectDto project = projectService.findProjectById(projectId);
-        return projectAssembler.toModel(project);
+        return projectModelAssembler.toModel(project);
     }
 
     @PatchMapping("{projectId}")
@@ -89,11 +91,12 @@ public class ProjectController {
     }
 
     @GetMapping("{projectId}/bugs")
-    public CollectionModel<EntityModel<BugDto>> getAllBugs(@PathVariable Long projectId) {
-        List<EntityModel<BugDto>> bugs = projectService.findAllBugs(projectId).stream()
-                .map(bugAssembler::toModel)
-                .toList();
+    public CollectionModel<EntityModel<BugDto>> getAllBugs(
+            @PathVariable Long projectId,
+            @PageableDefault(page = 0, size = 15) Pageable pageable) {
 
-        return CollectionModel.of(bugs, linkTo(methodOn(ProjectController.class).getAllBugs(projectId)).withSelfRel());
+        Page<BugDto> bugsPage = projectService.findAllBugsByProjectId(projectId, pageable);
+
+        return pagedBugResourcesAssembler.toModel(bugsPage, bugModelAssembler);
     }
 }

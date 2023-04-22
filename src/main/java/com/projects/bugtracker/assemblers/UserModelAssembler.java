@@ -4,6 +4,7 @@ import com.projects.bugtracker.controllers.ProjectController;
 import com.projects.bugtracker.controllers.UserController;
 import com.projects.bugtracker.dto.UserDto;
 import lombok.NonNull;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,7 @@ public class UserModelAssembler implements RepresentationModelAssembler<UserDto,
 
         return EntityModel.of(userDto,
                 linkTo(methodOn(UserController.class).getUser(username)).withSelfRel(),
-                linkTo(methodOn(ProjectController.class).getAllProjects(username, null)).withRel("owned-projects").expand(),
-                linkTo(methodOn(ProjectController.class).getAllProjects(null, username)).withRel("shared-projects").expand());
+                linkTo(methodOn(ProjectController.class).getProjectsPage(username, null, Pageable.unpaged())).withRel("owned-projects").expand(),
+                linkTo(methodOn(ProjectController.class).getProjectsPage(null, username, Pageable.unpaged())).withRel("shared-projects").expand());
     }
 }

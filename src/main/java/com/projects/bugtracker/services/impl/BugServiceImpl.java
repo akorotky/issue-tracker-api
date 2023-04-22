@@ -10,6 +10,8 @@ import com.projects.bugtracker.repositories.BugRepository;
 import com.projects.bugtracker.repositories.ProjectRepository;
 import com.projects.bugtracker.services.BugService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,8 +24,8 @@ public class BugServiceImpl implements BugService {
     private final ProjectRepository projectRepo;
 
     @Override
-    public List<BugDto> findAllBugs() {
-        return bugRepo.findAll().stream().map(BugMapper::toDto).toList();
+    public Page<BugDto> findAllBugs(Pageable pageable) {
+        return bugRepo.findAll(pageable).map(BugMapper::toDto);
     }
 
     @Override

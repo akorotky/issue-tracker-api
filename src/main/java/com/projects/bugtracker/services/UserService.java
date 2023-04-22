@@ -2,6 +2,8 @@ package com.projects.bugtracker.services;
 
 import com.projects.bugtracker.dto.ProjectDto;
 import com.projects.bugtracker.dto.UserDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -15,7 +17,7 @@ public interface UserService {
 
     List<ProjectDto> getSharedProjects(String username);
 
-    List<UserDto> findAllUsers();
+    Page<UserDto> findAllUsers(Pageable pageable);
 
     void createUser(UserDto userDto);
 

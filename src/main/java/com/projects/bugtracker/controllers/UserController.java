@@ -1,20 +1,19 @@
 package com.projects.bugtracker.controllers;
 
-import com.projects.bugtracker.assemblers.ProjectModelAssembler;
 import com.projects.bugtracker.assemblers.UserModelAssembler;
-import com.projects.bugtracker.dto.ProjectDto;
 import com.projects.bugtracker.dto.UserDto;
 import com.projects.bugtracker.services.impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.data.web.SortDefault;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("api/users")
@@ -22,15 +21,18 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class UserController {
 
     private final UserServiceImpl userService;
-    private final UserModelAssembler userAssembler;
+    private final UserModelAssembler userModelAssembler;
+    private final PagedResourcesAssembler<UserDto> pagedResourcesAssembler;
 
     @GetMapping
-    public CollectionModel<EntityModel<UserDto>> getAllUsers() {
-        List<EntityModel<UserDto>> users = userService.findAllUsers().stream()
-                .map(userAssembler::toModel)
-                .toList();
+    public PagedModel<EntityModel<UserDto>> getUsersPage(
+            @PageableDefault(page = 0, size = 15)
+            @SortDefault.SortDefaults({
+                    @SortDefault(sort = "username", direction = Sort.Direction.DESC)
+            }) Pageable pageable) {
+        Page<UserDto> usersPage = userService.findAllUsers(pageable);
 
-        return CollectionModel.of(users, linkTo(methodOn(UserController.class).getAllUsers()).withSelfRel());
+        return pagedResourcesAssembler.toModel(usersPage, userModelAssembler);
     }
 
     @PostMapping
@@ -41,7 +43,7 @@ public class UserController {
     @GetMapping("{username}")
     public EntityModel<UserDto> getUser(@PathVariable String username) {
         UserDto user = userService.findUserByUsername(username);
-        return userAssembler.toModel(user);
+        return userModelAssembler.toModel(user);
     }
 
     @DeleteMapping("{username}")

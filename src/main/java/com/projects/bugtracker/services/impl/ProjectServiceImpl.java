@@ -8,6 +8,9 @@ import com.projects.bugtracker.repositories.ProjectRepository;
 import com.projects.bugtracker.repositories.UserRepository;
 import com.projects.bugtracker.services.ProjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,29 +23,30 @@ public class ProjectServiceImpl implements ProjectService {
     private final UserRepository userRepository;
 
     @Override
-    public List<ProjectDto> findAllProjects() {
-        return projectRepository.findAll().stream().map(ProjectMapper::toDto).toList();
+    public Page<ProjectDto> findAllProjects(Pageable pageable) {
+        return projectRepository.findAll(pageable).map(ProjectMapper::toDto);
     }
 
     @Override
-    public List<ProjectDto> findAllProjectsByOwner(String username) {
+    public Page<ProjectDto> findAllProjectsByOwner(String username, Pageable pageable) {
         User owner = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-        return projectRepository.findByOwner_Username(username).stream().map(ProjectMapper::toDto).toList();
+        return projectRepository.findByOwner_Username(username, pageable).map(ProjectMapper::toDto);
     }
 
     @Override
-    public List<ProjectDto> findAllProjectsByCollaborator(String username) {
+    public Page<ProjectDto> findAllProjectsByCollaborator(String username, Pageable pageable) {
         User collaborator = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-        return projectRepository.findByCollaborators_Username(username).stream().map(ProjectMapper::toDto).toList();
+        return projectRepository.findByCollaborators_Username(username, pageable).map(ProjectMapper::toDto);
     }
 
     @Override
-    public List<BugDto> findAllBugs(Long projectId) {
+    public Page<BugDto> findAllBugsByProjectId(Long projectId, Pageable pageable) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project", "id", projectId));
-        return project.getBugs().stream().map(BugMapper::toDto).toList();
+        List<BugDto> bugs = project.getBugs().stream().map(BugMapper::toDto).toList();
+        return new PageImpl<>(bugs, pageable, bugs.size()) ;
     }
 
     @Override

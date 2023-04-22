@@ -4,6 +4,8 @@ import com.projects.bugtracker.dto.BugDto;
 import com.projects.bugtracker.dto.ProjectDto;
 import com.projects.bugtracker.dto.UserDto;
 import com.projects.bugtracker.entities.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -11,13 +13,13 @@ public interface ProjectService {
 
     ProjectDto findProjectById(Long id);
 
-    List<ProjectDto> findAllProjects();
+    Page<ProjectDto> findAllProjects(Pageable pageable);
 
-    List<ProjectDto> findAllProjectsByOwner(String username);
+    Page<ProjectDto> findAllProjectsByOwner(String username, Pageable pageable);
 
-    List<ProjectDto> findAllProjectsByCollaborator(String username);
+    Page<ProjectDto> findAllProjectsByCollaborator(String username, Pageable pageable);
 
-    List<BugDto> findAllBugs(Long projectId);
+    Page<BugDto> findAllBugsByProjectId(Long projectId, Pageable pageable);
 
     void createProject(ProjectDto projectDto, User user);
 
@@ -30,5 +32,4 @@ public interface ProjectService {
     void addProjectCollaborator(Long projectId, String username);
 
     void removeProjectCollaborator(Long projectId, String username);
-
 }

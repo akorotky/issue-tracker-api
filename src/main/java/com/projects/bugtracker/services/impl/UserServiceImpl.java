@@ -15,6 +15,8 @@ import com.projects.bugtracker.repositories.UserRepository;
 import com.projects.bugtracker.security.UserPrincipal;
 import com.projects.bugtracker.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -42,8 +44,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public List<UserDto> findAllUsers() {
-        return userRepo.findAll().stream().map(UserMapper::toDto).toList();
+    public Page<UserDto> findAllUsers(Pageable pageable) {
+        return userRepo.findAll(pageable).map(UserMapper::toDto);
     }
 
     @Override

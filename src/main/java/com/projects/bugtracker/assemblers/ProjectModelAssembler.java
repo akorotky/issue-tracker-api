@@ -5,6 +5,7 @@ import com.projects.bugtracker.controllers.ProjectController;
 import com.projects.bugtracker.controllers.UserController;
 import com.projects.bugtracker.dto.ProjectDto;
 import lombok.NonNull;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,6 @@ public class ProjectModelAssembler implements RepresentationModelAssembler<Proje
                 linkTo(methodOn(ProjectController.class).getProject(projectId)).withSelfRel(),
                 linkTo(methodOn(UserController.class).getUser(username)).withRel("owner"),
                 linkTo(methodOn(ProjectController.class).getAllCollaborators(projectId)).withRel("collaborators"),
-                linkTo(methodOn(ProjectController.class).getAllBugs(projectId)).withRel("bugs"));
+                linkTo(methodOn(ProjectController.class).getAllBugs(projectId, Pageable.unpaged())).withRel("bugs"));
     }
 }

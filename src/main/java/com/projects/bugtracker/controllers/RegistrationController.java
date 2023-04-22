@@ -1,5 +1,6 @@
 package com.projects.bugtracker.controllers;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,8 +15,7 @@ public class RegistrationController {
     public RepresentationModel<?> register() {
 
         return new RepresentationModel<>().add(
-                linkTo(methodOn(UserController.class).getAllUsers()).withRel("users"),
+                linkTo(methodOn(UserController.class).getUsersPage(Pageable.unpaged())).withRel("users"),
                 linkTo(methodOn(RegistrationController.class).register()).withSelfRel());
     }
-
 }
