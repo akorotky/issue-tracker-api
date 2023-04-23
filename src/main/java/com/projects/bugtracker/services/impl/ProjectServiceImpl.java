@@ -9,7 +9,6 @@ import com.projects.bugtracker.repositories.UserRepository;
 import com.projects.bugtracker.services.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -39,14 +38,6 @@ public class ProjectServiceImpl implements ProjectService {
         User collaborator = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
         return projectRepository.findByCollaborators_Username(username, pageable).map(ProjectMapper::toDto);
-    }
-
-    @Override
-    public Page<BugDto> findAllBugsByProjectId(Long projectId, Pageable pageable) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project", "id", projectId));
-        List<BugDto> bugs = project.getBugs().stream().map(BugMapper::toDto).toList();
-        return new PageImpl<>(bugs, pageable, bugs.size()) ;
     }
 
     @Override

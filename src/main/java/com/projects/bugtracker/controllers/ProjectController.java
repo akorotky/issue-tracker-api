@@ -8,6 +8,7 @@ import com.projects.bugtracker.assemblers.UserModelAssembler;
 import com.projects.bugtracker.dto.UserDto;
 import com.projects.bugtracker.security.CurrentUser;
 import com.projects.bugtracker.security.UserPrincipal;
+import com.projects.bugtracker.services.BugService;
 import com.projects.bugtracker.services.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final BugService bugService;
     private final ProjectModelAssembler projectModelAssembler;
     private final UserModelAssembler userAssembler;
     private final BugModelAssembler bugModelAssembler;
@@ -94,9 +96,7 @@ public class ProjectController {
     public CollectionModel<EntityModel<BugDto>> getAllBugs(
             @PathVariable Long projectId,
             @PageableDefault(page = 0, size = 15) Pageable pageable) {
-
-        Page<BugDto> bugsPage = projectService.findAllBugsByProjectId(projectId, pageable);
-
+        Page<BugDto> bugsPage = bugService.findAllBugsByProjectId(projectId, pageable);
         return pagedBugResourcesAssembler.toModel(bugsPage, bugModelAssembler);
     }
 }

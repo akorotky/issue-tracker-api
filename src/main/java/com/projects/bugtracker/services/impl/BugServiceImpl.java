@@ -14,50 +14,48 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class BugServiceImpl implements BugService {
 
-    private final BugRepository bugRepo;
-    private final ProjectRepository projectRepo;
+    private final BugRepository bugRepository;
+    private final ProjectRepository projectRepository;
 
     @Override
     public Page<BugDto> findAllBugs(Pageable pageable) {
-        return bugRepo.findAll(pageable).map(BugMapper::toDto);
+        return bugRepository.findAll(pageable).map(BugMapper::toDto);
     }
 
     @Override
-    public List<BugDto> findAllBugsByProject(Long projectId) {
-        Project project = projectRepo.findById(projectId)
+    public Page<BugDto> findAllBugsByProjectId(Long projectId, Pageable pageable) {
+        Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project", "id", projectId));
-        return bugRepo.findAllByProject(project).stream().map(BugMapper::toDto).toList();
+        return bugRepository.findByProject(project, pageable).map(BugMapper::toDto);
     }
 
     @Override
     public void createBug(BugDto bugDto, User user) {
-        Project project = projectRepo.findById(bugDto.projectId())
+        Project project = projectRepository.findById(bugDto.projectId())
                 .orElseThrow(() -> new ResourceNotFoundException("Project", "id", bugDto.projectId()));
         Bug bug = BugMapper.toBug(bugDto);
         bug.setProject(project);
         bug.setAuthor(user);
-        bugRepo.save(bug);
+        bugRepository.save(bug);
     }
 
     @Override
     public void updateBug(BugDto bugDto) {
-        bugRepo.save(BugMapper.toBug(bugDto));
+        bugRepository.save(BugMapper.toBug(bugDto));
     }
 
     @Override
     public BugDto findBugById(Long bugId) {
-        return BugMapper.toDto(bugRepo.findById(bugId).
+        return BugMapper.toDto(bugRepository.findById(bugId).
                 orElseThrow(() -> new ResourceNotFoundException("Bug", "id", bugId)));
     }
 
     @Override
     public void deleteBugById(Long bugId) {
-        bugRepo.deleteById(bugId);
+        bugRepository.deleteById(bugId);
     }
 }

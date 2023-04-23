@@ -1,6 +1,5 @@
 package com.projects.bugtracker.services;
 
-import com.projects.bugtracker.dto.BugDto;
 import com.projects.bugtracker.dto.ProjectDto;
 import com.projects.bugtracker.dto.UserDto;
 import com.projects.bugtracker.entities.User;
@@ -18,8 +17,6 @@ public interface ProjectService {
     Page<ProjectDto> findAllProjectsByOwner(String username, Pageable pageable);
 
     Page<ProjectDto> findAllProjectsByCollaborator(String username, Pageable pageable);
-
-    Page<BugDto> findAllBugsByProjectId(Long projectId, Pageable pageable);
 
     void createProject(ProjectDto projectDto, User user);
 

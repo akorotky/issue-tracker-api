@@ -14,6 +14,9 @@ public record BugCommentDto(
         String body,
 
         @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-        UserDto author
+        UserDto author,
+
+        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+        Long bugId
 ) {
 }

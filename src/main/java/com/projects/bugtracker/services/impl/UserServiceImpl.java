@@ -32,31 +32,31 @@ import java.util.Set;
 public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final String USER_NOT_FOUND_MSG = "User with %s %s not found";
-    private final UserRepository userRepo;
-    private final RoleRepository roleRepo;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String username) {
-        User user = userRepo.findByUsername(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format(USER_NOT_FOUND_MSG, "username", username)));
         return new UserPrincipal(user);
     }
 
     @Override
     public Page<UserDto> findAllUsers(Pageable pageable) {
-        return userRepo.findAll(pageable).map(UserMapper::toDto);
+        return userRepository.findAll(pageable).map(UserMapper::toDto);
     }
 
     @Override
     public UserDto findUserByUsername(String username) {
-        return UserMapper.toDto(userRepo.findByUsername(username)
+        return UserMapper.toDto(userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username)));
     }
 
     @Override
     public UserDto findUserById(Long userId) {
-        return UserMapper.toDto(userRepo.findById(userId)
+        return UserMapper.toDto(userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId)));
     }
 
@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         Set<Role> roles = new HashSet<>();
-        roles.add(roleRepo.findRoleByName(RoleType.USER)
+        roles.add(roleRepository.findRoleByName(RoleType.USER)
                 .orElseThrow(() -> new ResourceNotFoundException("Role", "name", RoleType.USER)));
 
         user.setRoles(roles);
@@ -76,29 +76,29 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setAccountExpired(false);
         user.setCredentialsExpired(false);
 
-        userRepo.save(user);
+        userRepository.save(user);
     }
 
     @Override
     public void updateUser(UserDto userDto) {
-        userRepo.save(UserMapper.toUser(userDto));
+        userRepository.save(UserMapper.toUser(userDto));
     }
 
     @Override
     public void deleteUserById(Long userId) {
-        User user = userRepo.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
         for (Project project : user.getSharedProjects()) {
             project.removeCollaborator(user);
         }
 
-        userRepo.deleteById(userId);
+        userRepository.deleteById(userId);
     }
 
     @Override
     public void deleteUserByUsername(String username) {
-        User user = userRepo.findByUsername(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 
         for (Project project : user.getSharedProjects()) {
@@ -109,22 +109,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             bug.setAuthor(null);
         }
 
-        userRepo.deleteByUsername(username);
+        userRepository.deleteByUsername(username);
     }
 
     @Override
     public List<ProjectDto> getOwnedProjects(String username) {
-        User user = userRepo.findByUsername(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-
         return user.getOwnedProjects().stream().map(ProjectMapper::toDto).toList();
     }
 
     @Override
     public List<ProjectDto> getSharedProjects(String username) {
-        User user = userRepo.findByUsername(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-
         return user.getSharedProjects().stream().map(ProjectMapper::toDto).toList();
     }
 }

@@ -26,6 +26,6 @@ public class BugModelAssembler implements RepresentationModelAssembler<BugDto, E
                 linkTo(methodOn(BugController.class).getBug(bugId)).withSelfRel(),
                 linkTo(methodOn(UserController.class).getUser(username)).withRel("author"),
                 linkTo(methodOn(ProjectController.class).getProject(projectId)).withRel("project"),
-                linkTo(methodOn(ProjectController.class).getAllBugs(projectId, Pageable.unpaged())).withRel("bugs").expand());
+                linkTo(methodOn(BugController.class).getComments(bugId, Pageable.unpaged())).withRel("comments").expand());
     }
 }

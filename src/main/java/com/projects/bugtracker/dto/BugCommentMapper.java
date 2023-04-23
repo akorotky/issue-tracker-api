@@ -9,7 +9,8 @@ public class BugCommentMapper {
         return new BugCommentDto(
                 comment.getId(),
                 comment.getBody(),
-                UserMapper.toDto(comment.getAuthor()));
+                UserMapper.toDto(comment.getAuthor()),
+                comment.getBug().getId());
     }
 
     public static BugComment toBugComment(BugCommentDto commentDto) {
