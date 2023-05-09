@@ -57,7 +57,7 @@ public class JwtTokenService {
 
         Authentication authentication = getAuthentication(refreshToken, TokenType.REFRESH);
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return generateRefreshToken(userDetails);
+        return generateAccessToken(userDetails);
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
