@@ -1,6 +1,6 @@
 package com.projects.bugtracker.controllers;
 
-import com.projects.bugtracker.assemblers.UserModelAssembler;
+import com.projects.bugtracker.assemblers.ModelAssembler;
 import com.projects.bugtracker.dto.UserDto;
 import com.projects.bugtracker.services.impl.UserServiceImpl;
 import jakarta.validation.Valid;
@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserServiceImpl userService;
-    private final UserModelAssembler userModelAssembler;
-    private final PagedResourcesAssembler<UserDto> pagedResourcesAssembler;
+    private final ModelAssembler<UserDto> userDtoModelAssembler;
+    private final PagedResourcesAssembler<UserDto> userDtoPagedResourcesAssembler;
 
     @GetMapping
     public PagedModel<EntityModel<UserDto>> getUsersPage(
@@ -32,7 +32,7 @@ public class UserController {
             }) Pageable pageable) {
         Page<UserDto> usersPage = userService.findAllUsers(pageable);
 
-        return pagedResourcesAssembler.toModel(usersPage, userModelAssembler);
+        return userDtoPagedResourcesAssembler.toModel(usersPage, userDtoModelAssembler);
     }
 
     @PostMapping
@@ -43,7 +43,7 @@ public class UserController {
     @GetMapping("{username}")
     public EntityModel<UserDto> getUser(@PathVariable String username) {
         UserDto user = userService.findUserByUsername(username);
-        return userModelAssembler.toModel(user);
+        return userDtoModelAssembler.toModel(user);
     }
 
     @DeleteMapping("{username}")

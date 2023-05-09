@@ -1,19 +1,19 @@
-package com.projects.bugtracker.assemblers;
+package com.projects.bugtracker.assemblers.impl;
 
+import com.projects.bugtracker.assemblers.ModelAssembler;
 import com.projects.bugtracker.controllers.ProjectController;
 import com.projects.bugtracker.controllers.UserController;
 import com.projects.bugtracker.dto.UserDto;
 import lombok.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
-public class UserModelAssembler implements RepresentationModelAssembler<UserDto, EntityModel<UserDto>> {
+public class UserModelAssembler implements ModelAssembler<UserDto> {
 
     @Override
     public @NonNull EntityModel<UserDto> toModel(UserDto userDto) {

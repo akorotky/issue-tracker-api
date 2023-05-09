@@ -1,7 +1,6 @@
 package com.projects.bugtracker.controllers;
 
 import com.projects.bugtracker.dto.*;
-import com.projects.bugtracker.security.JwtTokenService;
 import com.projects.bugtracker.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -9,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.Objects;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -20,7 +18,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
-    private final JwtTokenService jwtTokenService;
 
     @PostMapping("/signup")
     public ResponseEntity<AuthenticationResponse> signUp(@RequestBody UserDto userDto){

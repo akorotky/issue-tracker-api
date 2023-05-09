@@ -1,4 +1,4 @@
-package com.projects.bugtracker.security;
+package com.projects.bugtracker.security.principal;
 
 import com.projects.bugtracker.entities.User;
 import lombok.AllArgsConstructor;

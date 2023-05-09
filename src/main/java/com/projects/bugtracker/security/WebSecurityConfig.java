@@ -21,6 +21,14 @@ public class WebSecurityConfig {
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenAuthenticationFilter jwtTokenAuthenticationFilter;
+    private final String[] WHITELIST = {
+            /* DEV */
+            "/error", // Enable Error Tracing
+            "/api/auth/**",
+            /* Swagger/OpenAPI */
+            "/v3/api-docs/**",
+            "/swagger-ui/**"
+    };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -31,7 +39,7 @@ public class WebSecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/error", "/", "", "/api/auth/**")
+                .requestMatchers(WHITELIST)
                 .permitAll()
                 .anyRequest()
                 .authenticated()

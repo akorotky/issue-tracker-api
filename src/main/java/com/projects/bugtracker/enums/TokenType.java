@@ -1,4 +1,4 @@
-package com.projects.bugtracker.security;
+package com.projects.bugtracker.enums;
 
 public enum TokenType {
     ACCESS,

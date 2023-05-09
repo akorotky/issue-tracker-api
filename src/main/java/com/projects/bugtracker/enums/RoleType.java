@@ -1,4 +1,4 @@
-package com.projects.bugtracker.constants;
+package com.projects.bugtracker.enums;
 
 public enum RoleType {
     USER,

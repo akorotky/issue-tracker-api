@@ -2,7 +2,7 @@ package com.projects.bugtracker.services.impl;
 
 import com.projects.bugtracker.dto.*;
 import com.projects.bugtracker.services.AuthenticationService;
-import com.projects.bugtracker.security.JwtTokenService;
+import com.projects.bugtracker.services.JwtTokenService;
 import com.projects.bugtracker.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

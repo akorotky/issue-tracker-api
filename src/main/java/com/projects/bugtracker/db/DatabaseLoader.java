@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projects.bugtracker.dto.ProjectDto;
 import com.projects.bugtracker.dto.UserDto;
 import com.projects.bugtracker.entities.Role;
-import com.projects.bugtracker.constants.RoleType;
+import com.projects.bugtracker.enums.RoleType;
 import com.projects.bugtracker.entities.User;
 import com.projects.bugtracker.exceptions.ResourceNotFoundException;
 import com.projects.bugtracker.repositories.RoleRepository;

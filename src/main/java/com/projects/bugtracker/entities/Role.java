@@ -1,6 +1,6 @@
 package com.projects.bugtracker.entities;
 
-import com.projects.bugtracker.constants.RoleType;
+import com.projects.bugtracker.enums.RoleType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

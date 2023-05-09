@@ -1,9 +1,9 @@
 package com.projects.bugtracker.controllers;
 
-import com.projects.bugtracker.assemblers.BugCommentModelAssembler;
+import com.projects.bugtracker.assemblers.ModelAssembler;
 import com.projects.bugtracker.dto.BugCommentDto;
-import com.projects.bugtracker.security.CurrentUser;
-import com.projects.bugtracker.security.UserPrincipal;
+import com.projects.bugtracker.security.principal.CurrentUser;
+import com.projects.bugtracker.security.principal.UserPrincipal;
 import com.projects.bugtracker.services.BugCommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,19 +21,19 @@ import org.springframework.web.bind.annotation.*;
 public class BugCommentController {
 
     private final BugCommentService bugCommentService;
-    private final BugCommentModelAssembler bugCommentModelAssembler;
-    private final PagedResourcesAssembler<BugCommentDto> pagedResourcesAssembler;
+    private final ModelAssembler<BugCommentDto> bugCommentDtoModelAssembler;
+    private final PagedResourcesAssembler<BugCommentDto> bugCommentDtoPagedResourcesAssembler;
 
     @GetMapping
     public PagedModel<EntityModel<BugCommentDto>> getBugCommentsPage(@PageableDefault(page = 0, size = 15) Pageable pageable) {
         Page<BugCommentDto> commentsPage = bugCommentService.findAllBugComments(pageable);
-        return pagedResourcesAssembler.toModel(commentsPage, bugCommentModelAssembler);
+        return bugCommentDtoPagedResourcesAssembler.toModel(commentsPage, bugCommentDtoModelAssembler);
     }
 
     @GetMapping("{commentId}")
     public EntityModel<BugCommentDto> getBugComment(@PathVariable Long commentId) {
         BugCommentDto bugCommentDto = bugCommentService.findBugCommentById(commentId);
-        return bugCommentModelAssembler.toModel(bugCommentDto);
+        return bugCommentDtoModelAssembler.toModel(bugCommentDto);
     }
 
     @PostMapping

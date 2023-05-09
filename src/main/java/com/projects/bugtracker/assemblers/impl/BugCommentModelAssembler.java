@@ -1,19 +1,19 @@
-package com.projects.bugtracker.assemblers;
+package com.projects.bugtracker.assemblers.impl;
 
+import com.projects.bugtracker.assemblers.ModelAssembler;
 import com.projects.bugtracker.controllers.BugCommentController;
 import com.projects.bugtracker.controllers.BugController;
 import com.projects.bugtracker.controllers.UserController;
 import com.projects.bugtracker.dto.BugCommentDto;
 import lombok.NonNull;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
-public class BugCommentModelAssembler implements RepresentationModelAssembler<BugCommentDto, EntityModel<BugCommentDto>> {
+public class BugCommentModelAssembler implements ModelAssembler<BugCommentDto> {
 
     @Override
     public @NonNull EntityModel<BugCommentDto> toModel(BugCommentDto bugCommentDto) {

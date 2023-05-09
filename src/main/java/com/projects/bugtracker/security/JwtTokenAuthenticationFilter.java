@@ -1,5 +1,7 @@
 package com.projects.bugtracker.security;
 
+import com.projects.bugtracker.enums.TokenType;
+import com.projects.bugtracker.services.JwtTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
