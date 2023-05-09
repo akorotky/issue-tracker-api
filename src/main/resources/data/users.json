@@ -2,61 +2,51 @@
   {
     "username": "user",
     "password": "password",
-    "email": "user@bugtracker.test",
-    "roles": []
+    "email": "user@bugtracker.test"
   },
   {
     "username": "lex",
     "password": "lex12345",
-    "email": "lex@bugtracker.test",
-    "roles": []
+    "email": "lex@bugtracker.test"
   },
   {
     "username": "bob",
     "password": "bob12345",
-    "email": "bob@bugtracker.test",
-    "roles": []
+    "email": "bob@bugtracker.test"
   },
   {
     "username": "tom",
     "password": "tom12345",
-    "email": "tom@bugtracker.test",
-    "roles": []
+    "email": "tom@bugtracker.test"
   },
   {
     "username": "smith",
     "password": "smith12345",
-    "email": "smith@bugtracker.test",
-    "roles": []
+    "email": "smith@bugtracker.test"
   },
   {
     "username": "jack",
     "password": "jack12345",
-    "email": "jack@bugtracker.test",
-    "roles": []
+    "email": "jack@bugtracker.test"
   },
   {
     "username": "john",
     "password": "john12345",
-    "email": "john@bugtracker.test",
-    "roles": []
+    "email": "john@bugtracker.test"
   },
   {
     "username": "jim",
     "password": "jim12345",
-    "email": "jim@bugtracker.test",
-    "roles": []
+    "email": "jim@bugtracker.test"
   },
   {
     "username": "joe",
     "password": "joe12345",
-    "email": "user@bugtracker.test",
-    "roles": []
+    "email": "user@bugtracker.test"
   },
   {
     "username": "sam",
     "password": "sam12345",
-    "email": "sam@bugtracker.test",
-    "roles": []
+    "email": "sam@bugtracker.test"
   }
 ]

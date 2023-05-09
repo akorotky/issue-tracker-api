@@ -1,11 +1,11 @@
 package com.projects.bugtracker.services.impl;
 
+import com.projects.bugtracker.dto.bugcommentdto.BugCommentRequestDto;
 import com.projects.bugtracker.entities.Bug;
 import com.projects.bugtracker.entities.BugComment;
 import com.projects.bugtracker.entities.User;
 import com.projects.bugtracker.exceptions.ResourceNotFoundException;
-import com.projects.bugtracker.dto.BugCommentDto;
-import com.projects.bugtracker.dto.BugCommentMapper;
+import com.projects.bugtracker.dto.bugcommentdto.BugCommentDtoMapper;
 import com.projects.bugtracker.repositories.BugCommentRepository;
 import com.projects.bugtracker.repositories.BugRepository;
 import com.projects.bugtracker.services.BugCommentService;
@@ -20,38 +20,39 @@ public class BugCommentServiceImpl implements BugCommentService {
 
     private final BugCommentRepository bugCommentRepository;
     private final BugRepository bugRepository;
+    private final BugCommentDtoMapper bugCommentDtoMapper;
 
     @Override
-    public Page<BugCommentDto> findAllBugComments(Pageable pageable) {
-        return bugCommentRepository.findAll(pageable).map(BugCommentMapper::toDto);
+    public Page<BugComment> findAllBugComments(Pageable pageable) {
+        return bugCommentRepository.findAll(pageable);
     }
 
     @Override
-    public BugCommentDto findBugCommentById(Long commentId) {
-        return BugCommentMapper.toDto(bugCommentRepository.findById(commentId).
-                orElseThrow(() -> new ResourceNotFoundException("Bug comment", "id", commentId)));
+    public BugComment findBugCommentById(Long commentId) {
+        return bugCommentRepository.findById(commentId).
+                orElseThrow(() -> new ResourceNotFoundException("Bug comment", "id", commentId));
     }
 
     @Override
-    public Page<BugCommentDto> findAllCommentsByBugId(Long bugId, Pageable pageable) {
+    public Page<BugComment> findAllCommentsByBugId(Long bugId, Pageable pageable) {
         Bug bug = bugRepository.findById(bugId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bug", "id", bugId));
-        return bugCommentRepository.findByBug(bug, pageable).map(BugCommentMapper::toDto);
+        return bugCommentRepository.findByBug(bug, pageable);
     }
 
     @Override
-    public void createBugComment(BugCommentDto bugCommentDto, User user) {
-        Bug bug = bugRepository.findById(bugCommentDto.bugId()).
-                orElseThrow(() -> new ResourceNotFoundException("Bug", "id", bugCommentDto.bugId()));
-        BugComment bugComment = BugCommentMapper.toBugComment(bugCommentDto);
+    public void createBugComment(BugCommentRequestDto bugCommentRequestDto, User user) {
+        Bug bug = bugRepository.findById(bugCommentRequestDto.bugId()).
+                orElseThrow(() -> new ResourceNotFoundException("Bug", "id", bugCommentRequestDto.bugId()));
+        BugComment bugComment = bugCommentDtoMapper.toEntity(bugCommentRequestDto);
         bugComment.setAuthor(user);
         bugComment.setBug(bug);
         bugCommentRepository.save(bugComment);
     }
 
     @Override
-    public void updateBugComment(BugCommentDto bugCommentDto) {
-        bugCommentRepository.save(BugCommentMapper.toBugComment(bugCommentDto));
+    public void updateBugComment(BugCommentRequestDto bugCommentRequestDto) {
+        bugCommentRepository.save(bugCommentDtoMapper.toEntity(bugCommentRequestDto));
     }
 
     @Override

@@ -1,7 +1,8 @@
 package com.projects.bugtracker.services;
 
-import com.projects.bugtracker.dto.ProjectDto;
-import com.projects.bugtracker.dto.UserDto;
+import com.projects.bugtracker.dto.userdto.UserRequestDto;
+import com.projects.bugtracker.entities.Project;
+import com.projects.bugtracker.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -9,19 +10,19 @@ import java.util.List;
 
 public interface UserService {
 
-    UserDto findUserById(Long id);
+    User findUserById(Long id);
 
-    UserDto findUserByUsername(String username);
+    User findUserByUsername(String username);
 
-    List<ProjectDto> getOwnedProjects(String username);
+    List<Project> getOwnedProjects(String username);
 
-    List<ProjectDto> getSharedProjects(String username);
+    List<Project> getSharedProjects(String username);
 
-    Page<UserDto> findAllUsers(Pageable pageable);
+    Page<User> findAllUsers(Pageable pageable);
 
-    void createUser(UserDto userDto);
+    void createUser(UserRequestDto userRequestDto);
 
-    void updateUser(UserDto userDto);
+    void updateUser(UserRequestDto userRequestDto);
 
     void deleteUserById(Long id);
 

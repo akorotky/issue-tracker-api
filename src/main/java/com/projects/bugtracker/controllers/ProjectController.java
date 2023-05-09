@@ -1,9 +1,13 @@
 package com.projects.bugtracker.controllers;
 
 import com.projects.bugtracker.assemblers.ModelAssembler;
-import com.projects.bugtracker.dto.BugDto;
-import com.projects.bugtracker.dto.ProjectDto;
-import com.projects.bugtracker.dto.UserDto;
+import com.projects.bugtracker.dto.bugdto.BugDtoMapper;
+import com.projects.bugtracker.dto.bugdto.BugResponseDto;
+import com.projects.bugtracker.dto.projectdto.ProjectDtoMapper;
+import com.projects.bugtracker.dto.projectdto.ProjectRequestDto;
+import com.projects.bugtracker.dto.projectdto.ProjectResponseDto;
+import com.projects.bugtracker.dto.userdto.UserDtoMapper;
+import com.projects.bugtracker.dto.userdto.UserResponseDto;
 import com.projects.bugtracker.security.principal.CurrentUser;
 import com.projects.bugtracker.security.principal.UserPrincipal;
 import com.projects.bugtracker.services.BugService;
@@ -30,34 +34,40 @@ public class ProjectController {
 
     private final ProjectService projectService;
     private final BugService bugService;
-    private final ModelAssembler<ProjectDto> projectDtoModelAssembler;
-    private final ModelAssembler<UserDto> userDtoModelAssembler;
-    private final ModelAssembler<BugDto> bugDtoModelAssembler;
-    private final PagedResourcesAssembler<ProjectDto> projectDtoPagedResourcesAssembler;
-    private final PagedResourcesAssembler<BugDto> bugDtoPagedResourcesAssembler;
+    private final BugDtoMapper bugDtoMapper;
+    private final UserDtoMapper userDtoMapper;
+    private final ProjectDtoMapper projectDtoMapper;
+    private final ModelAssembler<ProjectResponseDto> projectDtoModelAssembler;
+    private final ModelAssembler<UserResponseDto> userDtoModelAssembler;
+    private final ModelAssembler<BugResponseDto> bugDtoModelAssembler;
+    private final PagedResourcesAssembler<ProjectResponseDto> projectDtoPagedResourcesAssembler;
+    private final PagedResourcesAssembler<BugResponseDto> bugDtoPagedResourcesAssembler;
 
     @GetMapping
-    public PagedModel<EntityModel<ProjectDto>> getProjectsPage(
+    public PagedModel<EntityModel<ProjectResponseDto>> getProjectsPage(
             @RequestParam(required = false) String owner,
             @RequestParam(required = false) String collaborator,
             @PageableDefault(page = 0, size = 20) Pageable pageable) {
-        Page<ProjectDto> projectsPage;
+        Page<ProjectResponseDto> projectsPage;
 
-        if (owner == null && collaborator == null) projectsPage = projectService.findAllProjects(pageable);
-        else if (owner != null) projectsPage = projectService.findAllProjectsByOwner(owner, pageable);
-        else projectsPage = projectService.findAllProjectsByCollaborator(collaborator, pageable);
+        if (owner == null && collaborator == null)
+            projectsPage = projectService.findAllProjects(pageable).map(projectDtoMapper::toDto);
+        else if (owner != null)
+            projectsPage = projectService.findAllProjectsByOwner(owner, pageable).map(projectDtoMapper::toDto);
+        else
+            projectsPage = projectService.findAllProjectsByCollaborator(collaborator, pageable).map(projectDtoMapper::toDto);
 
         return projectDtoPagedResourcesAssembler.toModel(projectsPage, projectDtoModelAssembler);
     }
 
     @GetMapping("{projectId}")
-    public EntityModel<ProjectDto> getProject(@PathVariable Long projectId) {
-        ProjectDto project = projectService.findProjectById(projectId);
+    public EntityModel<ProjectResponseDto> getProject(@PathVariable Long projectId) {
+        ProjectResponseDto project = projectDtoMapper.toDto(projectService.findProjectById(projectId));
         return projectDtoModelAssembler.toModel(project);
     }
 
     @PatchMapping("{projectId}")
-    public void updateProject(@RequestBody ProjectDto project, @PathVariable Long projectId) {
+    public void updateProject(@RequestBody ProjectRequestDto project, @PathVariable Long projectId) {
         projectService.updateProject(project, projectId);
     }
 
@@ -67,13 +77,14 @@ public class ProjectController {
     }
 
     @PostMapping
-    public void createProject(@RequestBody ProjectDto project, @CurrentUser UserPrincipal currentUser) {
+    public void createProject(@RequestBody ProjectRequestDto project, @CurrentUser UserPrincipal currentUser) {
         projectService.createProject(project, currentUser.getUser());
     }
 
     @GetMapping("{projectId}/collaborators")
-    public CollectionModel<EntityModel<UserDto>> getAllCollaborators(@PathVariable Long projectId) {
-        List<EntityModel<UserDto>> collaborators = projectService.getProjectCollaborators(projectId).stream()
+    public CollectionModel<EntityModel<UserResponseDto>> getAllCollaborators(@PathVariable Long projectId) {
+        List<EntityModel<UserResponseDto>> collaborators = projectService.getProjectCollaborators(projectId).stream()
+                .map(userDtoMapper::toDto)
                 .map(userDtoModelAssembler::toModel)
                 .toList();
 
@@ -91,10 +102,10 @@ public class ProjectController {
     }
 
     @GetMapping("{projectId}/bugs")
-    public CollectionModel<EntityModel<BugDto>> getAllBugs(
+    public CollectionModel<EntityModel<BugResponseDto>> getAllBugs(
             @PathVariable Long projectId,
             @PageableDefault(page = 0, size = 15) Pageable pageable) {
-        Page<BugDto> bugsPage = bugService.findAllBugsByProjectId(projectId, pageable);
+        Page<BugResponseDto> bugsPage = bugService.findAllBugsByProjectId(projectId, pageable).map(bugDtoMapper::toDto);
         return bugDtoPagedResourcesAssembler.toModel(bugsPage, bugDtoModelAssembler);
     }
 }

@@ -24,6 +24,8 @@ public class WebSecurityConfig {
     private final String[] WHITELIST = {
             /* DEV */
             "/error", // Enable Error Tracing
+            /* PROD */
+            /* Authentication routes */
             "/api/auth/**",
             /* Swagger/OpenAPI */
             "/v3/api-docs/**",

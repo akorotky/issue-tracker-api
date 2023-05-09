@@ -1,14 +1,12 @@
 package com.projects.bugtracker.services.impl;
 
-import com.projects.bugtracker.dto.ProjectDto;
-import com.projects.bugtracker.dto.ProjectMapper;
+import com.projects.bugtracker.dto.userdto.UserRequestDto;
 import com.projects.bugtracker.entities.Bug;
 import com.projects.bugtracker.entities.Project;
 import com.projects.bugtracker.entities.Role;
 import com.projects.bugtracker.enums.RoleType;
 import com.projects.bugtracker.exceptions.ResourceNotFoundException;
-import com.projects.bugtracker.dto.UserDto;
-import com.projects.bugtracker.dto.UserMapper;
+import com.projects.bugtracker.dto.userdto.UserDtoMapper;
 import com.projects.bugtracker.entities.User;
 import com.projects.bugtracker.repositories.RoleRepository;
 import com.projects.bugtracker.repositories.UserRepository;
@@ -35,6 +33,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserDtoMapper userDtoMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) {
@@ -44,25 +43,25 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public Page<UserDto> findAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable).map(UserMapper::toDto);
+    public Page<User> findAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     @Override
-    public UserDto findUserByUsername(String username) {
-        return UserMapper.toDto(userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username)));
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
     }
 
     @Override
-    public UserDto findUserById(Long userId) {
-        return UserMapper.toDto(userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId)));
+    public User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
     }
 
     @Override
-    public void createUser(UserDto userDto) {
-        User user = UserMapper.toUser(userDto);
+    public void createUser(UserRequestDto userRequestDto) {
+        User user = userDtoMapper.toEntity(userRequestDto);
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
@@ -80,8 +79,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void updateUser(UserDto userDto) {
-        userRepository.save(UserMapper.toUser(userDto));
+    public void updateUser(UserRequestDto userRequestDto) {
+        userRepository.save(userDtoMapper.toEntity(userRequestDto));
     }
 
     @Override
@@ -113,16 +112,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public List<ProjectDto> getOwnedProjects(String username) {
+    public List<Project> getOwnedProjects(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-        return user.getOwnedProjects().stream().map(ProjectMapper::toDto).toList();
+        return user.getOwnedProjects().stream().toList();
     }
 
     @Override
-    public List<ProjectDto> getSharedProjects(String username) {
+    public List<Project> getSharedProjects(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-        return user.getSharedProjects().stream().map(ProjectMapper::toDto).toList();
+        return user.getSharedProjects().stream().toList();
     }
 }

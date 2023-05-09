@@ -2,8 +2,8 @@ package com.projects.bugtracker.db;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.projects.bugtracker.dto.ProjectDto;
-import com.projects.bugtracker.dto.UserDto;
+import com.projects.bugtracker.dto.projectdto.ProjectRequestDto;
+import com.projects.bugtracker.dto.userdto.UserRequestDto;
 import com.projects.bugtracker.entities.Role;
 import com.projects.bugtracker.enums.RoleType;
 import com.projects.bugtracker.entities.User;
@@ -38,14 +38,14 @@ public class DatabaseLoader implements CommandLineRunner {
         ObjectMapper objectMapper = new ObjectMapper();
 
         // load data from the json files into DTOs
-        List<ProjectDto> projectList = objectMapper.readValue(
+        List<ProjectRequestDto> projectList = objectMapper.readValue(
                 new File(PROJECTS_DATA_LOCATION),
-                new TypeReference<List<ProjectDto>>() {
+                new TypeReference<List<ProjectRequestDto>>() {
                 });
 
-        List<UserDto> userList = objectMapper.readValue(
+        List<UserRequestDto> userList = objectMapper.readValue(
                 new File(USERS_DATA_LOCATION),
-                new TypeReference<List<UserDto>>() {
+                new TypeReference<List<UserRequestDto>>() {
                 });
 
         // create roles

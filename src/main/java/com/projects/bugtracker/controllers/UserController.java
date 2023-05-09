@@ -1,7 +1,9 @@
 package com.projects.bugtracker.controllers;
 
 import com.projects.bugtracker.assemblers.ModelAssembler;
-import com.projects.bugtracker.dto.UserDto;
+import com.projects.bugtracker.dto.userdto.UserDtoMapper;
+import com.projects.bugtracker.dto.userdto.UserRequestDto;
+import com.projects.bugtracker.dto.userdto.UserResponseDto;
 import com.projects.bugtracker.services.impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,28 +23,29 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserServiceImpl userService;
-    private final ModelAssembler<UserDto> userDtoModelAssembler;
-    private final PagedResourcesAssembler<UserDto> userDtoPagedResourcesAssembler;
+    private final ModelAssembler<UserResponseDto> userDtoModelAssembler;
+    private final PagedResourcesAssembler<UserResponseDto> userDtoPagedResourcesAssembler;
+    private final UserDtoMapper userDtoMapper;
 
     @GetMapping
-    public PagedModel<EntityModel<UserDto>> getUsersPage(
+    public PagedModel<EntityModel<UserResponseDto>> getUsersPage(
             @PageableDefault(page = 0, size = 15)
             @SortDefault.SortDefaults({
                     @SortDefault(sort = "username", direction = Sort.Direction.DESC)
             }) Pageable pageable) {
-        Page<UserDto> usersPage = userService.findAllUsers(pageable);
+        Page<UserResponseDto> usersPage = userService.findAllUsers(pageable).map(userDtoMapper::toDto);
 
         return userDtoPagedResourcesAssembler.toModel(usersPage, userDtoModelAssembler);
     }
 
     @PostMapping
-    public void createUser(@Valid @RequestBody UserDto user) {
-        userService.createUser(user);
+    public void createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
+        userService.createUser(userRequestDto);
     }
 
     @GetMapping("{username}")
-    public EntityModel<UserDto> getUser(@PathVariable String username) {
-        UserDto user = userService.findUserByUsername(username);
+    public EntityModel<UserResponseDto> getUser(@PathVariable String username) {
+        UserResponseDto user = userDtoMapper.toDto(userService.findUserByUsername(username));
         return userDtoModelAssembler.toModel(user);
     }
 

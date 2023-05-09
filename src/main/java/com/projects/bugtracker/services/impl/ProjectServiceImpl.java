@@ -1,6 +1,7 @@
 package com.projects.bugtracker.services.impl;
 
-import com.projects.bugtracker.dto.*;
+import com.projects.bugtracker.dto.projectdto.ProjectDtoMapper;
+import com.projects.bugtracker.dto.projectdto.ProjectRequestDto;
 import com.projects.bugtracker.exceptions.ResourceNotFoundException;
 import com.projects.bugtracker.entities.Project;
 import com.projects.bugtracker.entities.User;
@@ -20,47 +21,47 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final ProjectDtoMapper projectDtoMapper;
 
     @Override
-    public Page<ProjectDto> findAllProjects(Pageable pageable) {
-        return projectRepository.findAll(pageable).map(ProjectMapper::toDto);
+    public Page<Project> findAllProjects(Pageable pageable) {
+        return projectRepository.findAll(pageable);
     }
 
     @Override
-    public Page<ProjectDto> findAllProjectsByOwner(String username, Pageable pageable) {
+    public Page<Project> findAllProjectsByOwner(String username, Pageable pageable) {
         User owner = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-        return projectRepository.findByOwner_Username(username, pageable).map(ProjectMapper::toDto);
+        return projectRepository.findByOwner_Username(username, pageable);
     }
 
     @Override
-    public Page<ProjectDto> findAllProjectsByCollaborator(String username, Pageable pageable) {
+    public Page<Project> findAllProjectsByCollaborator(String username, Pageable pageable) {
         User collaborator = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-        return projectRepository.findByCollaborators_Username(username, pageable).map(ProjectMapper::toDto);
+        return projectRepository.findByCollaborators_Username(username, pageable);
     }
 
     @Override
-    public ProjectDto findProjectById(Long projectId) {
-        Project project = projectRepository.findById(projectId)
+    public Project findProjectById(Long projectId) {
+        return projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project", "id", projectId));
-        return ProjectMapper.toDto(project);
     }
 
     @Override
-    public void createProject(ProjectDto projectDto, User user) {
-        Project project = ProjectMapper.toProject(projectDto);
+    public void createProject(ProjectRequestDto projectRequestDto, User user) {
+        Project project = projectDtoMapper.toEntity(projectRequestDto);
         project.setOwner(user);
         projectRepository.save(project);
     }
 
     @Override
-    public void updateProject(ProjectDto projectDto, Long projectId) {
+    public void updateProject(ProjectRequestDto projectRequestDto, Long projectId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project", "id", projectId));
 
-        project.setTitle(projectDto.title());
-        project.setTitle(projectDto.description());
+        project.setTitle(projectRequestDto.title());
+        project.setTitle(projectRequestDto.description());
 
         projectRepository.save(project);
     }
@@ -71,10 +72,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<UserDto> getProjectCollaborators(Long projectId) {
+    public List<User> getProjectCollaborators(Long projectId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project", "id", projectId));
-        return project.getCollaborators().stream().map(UserMapper::toDto).toList();
+        return project.getCollaborators().stream().toList();
     }
 
     @Override

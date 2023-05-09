@@ -1,8 +1,11 @@
 package com.projects.bugtracker.controllers;
 
 import com.projects.bugtracker.assemblers.ModelAssembler;
-import com.projects.bugtracker.dto.BugCommentDto;
-import com.projects.bugtracker.dto.BugDto;
+import com.projects.bugtracker.dto.bugcommentdto.BugCommentDtoMapper;
+import com.projects.bugtracker.dto.bugcommentdto.BugCommentResponseDto;
+import com.projects.bugtracker.dto.bugdto.BugDtoMapper;
+import com.projects.bugtracker.dto.bugdto.BugRequestDto;
+import com.projects.bugtracker.dto.bugdto.BugResponseDto;
 import com.projects.bugtracker.security.principal.CurrentUser;
 import com.projects.bugtracker.security.principal.UserPrincipal;
 import com.projects.bugtracker.services.BugCommentService;
@@ -25,26 +28,28 @@ public class BugController {
 
     private final BugService bugService;
     private final BugCommentService bugCommentService;
-    private final ModelAssembler<BugDto> bugDtoModelAssembler;
-    private final ModelAssembler<BugCommentDto> bugCommentDtoModelAssembler;
-    private final PagedResourcesAssembler<BugDto> bugDtoPagedResourcesAssembler;
-    private final PagedResourcesAssembler<BugCommentDto> bugCommentDtoPagedResourcesAssembler;
+    private final BugDtoMapper bugDtoMapper;
+    private final BugCommentDtoMapper bugCommentDtoMapper;
+    private final ModelAssembler<BugResponseDto> bugDtoModelAssembler;
+    private final ModelAssembler<BugCommentResponseDto> bugCommentDtoModelAssembler;
+    private final PagedResourcesAssembler<BugResponseDto> bugDtoPagedResourcesAssembler;
+    private final PagedResourcesAssembler<BugCommentResponseDto> bugCommentDtoPagedResourcesAssembler;
 
     @GetMapping
-    public CollectionModel<EntityModel<BugDto>> getBugsPage(@PageableDefault(page = 0, size = 15) Pageable pageable) {
-        Page<BugDto> bugsPage = bugService.findAllBugs(pageable);
+    public CollectionModel<EntityModel<BugResponseDto>> getBugsPage(@PageableDefault(page = 0, size = 15) Pageable pageable) {
+        Page<BugResponseDto> bugsPage = bugService.findAllBugs(pageable).map(bugDtoMapper::toDto);
         return bugDtoPagedResourcesAssembler.toModel(bugsPage, bugDtoModelAssembler);
     }
 
     @GetMapping("{bugId}")
-    public EntityModel<BugDto> getBug(@PathVariable Long bugId) {
-        BugDto bug = bugService.findBugById(bugId);
+    public EntityModel<BugResponseDto> getBug(@PathVariable Long bugId) {
+        BugResponseDto bug = bugDtoMapper.toDto(bugService.findBugById(bugId));
         return bugDtoModelAssembler.toModel(bug);
     }
 
     @PostMapping
-    public void createBug(@Valid @RequestBody BugDto bugDto, @CurrentUser UserPrincipal currentUser) {
-        bugService.createBug(bugDto, currentUser.getUser());
+    public void createBug(@Valid @RequestBody BugRequestDto bugRequestDto, @CurrentUser UserPrincipal currentUser) {
+        bugService.createBug(bugRequestDto, currentUser.getUser());
     }
 
     @DeleteMapping("{bugId}")
@@ -53,10 +58,10 @@ public class BugController {
     }
 
     @GetMapping("{bugId}/comments")
-    public PagedModel<EntityModel<BugCommentDto>> getComments(
+    public PagedModel<EntityModel<BugCommentResponseDto>> getComments(
             @PathVariable Long bugId,
             @PageableDefault(page = 0, size = 15) Pageable pageable) {
-        Page<BugCommentDto> commentsPage = bugCommentService.findAllCommentsByBugId(bugId, pageable);
+        Page<BugCommentResponseDto> commentsPage = bugCommentService.findAllCommentsByBugId(bugId, pageable).map(bugCommentDtoMapper::toDto);
         return bugCommentDtoPagedResourcesAssembler.toModel(commentsPage, bugCommentDtoModelAssembler);
     }
 }

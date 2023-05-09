@@ -1,7 +1,9 @@
 package com.projects.bugtracker.controllers;
 
 import com.projects.bugtracker.assemblers.ModelAssembler;
-import com.projects.bugtracker.dto.BugCommentDto;
+import com.projects.bugtracker.dto.bugcommentdto.BugCommentDtoMapper;
+import com.projects.bugtracker.dto.bugcommentdto.BugCommentRequestDto;
+import com.projects.bugtracker.dto.bugcommentdto.BugCommentResponseDto;
 import com.projects.bugtracker.security.principal.CurrentUser;
 import com.projects.bugtracker.security.principal.UserPrincipal;
 import com.projects.bugtracker.services.BugCommentService;
@@ -21,26 +23,27 @@ import org.springframework.web.bind.annotation.*;
 public class BugCommentController {
 
     private final BugCommentService bugCommentService;
-    private final ModelAssembler<BugCommentDto> bugCommentDtoModelAssembler;
-    private final PagedResourcesAssembler<BugCommentDto> bugCommentDtoPagedResourcesAssembler;
+    private final ModelAssembler<BugCommentResponseDto> bugCommentDtoModelAssembler;
+    private final PagedResourcesAssembler<BugCommentResponseDto> bugCommentDtoPagedResourcesAssembler;
+    private final BugCommentDtoMapper bugCommentDtoMapper;
 
     @GetMapping
-    public PagedModel<EntityModel<BugCommentDto>> getBugCommentsPage(@PageableDefault(page = 0, size = 15) Pageable pageable) {
-        Page<BugCommentDto> commentsPage = bugCommentService.findAllBugComments(pageable);
+    public PagedModel<EntityModel<BugCommentResponseDto>> getBugCommentsPage(@PageableDefault(page = 0, size = 15) Pageable pageable) {
+        Page<BugCommentResponseDto> commentsPage = bugCommentService.findAllBugComments(pageable).map(bugCommentDtoMapper::toDto);
         return bugCommentDtoPagedResourcesAssembler.toModel(commentsPage, bugCommentDtoModelAssembler);
     }
 
     @GetMapping("{commentId}")
-    public EntityModel<BugCommentDto> getBugComment(@PathVariable Long commentId) {
-        BugCommentDto bugCommentDto = bugCommentService.findBugCommentById(commentId);
+    public EntityModel<BugCommentResponseDto> getBugComment(@PathVariable Long commentId) {
+        BugCommentResponseDto bugCommentDto = bugCommentDtoMapper.toDto(bugCommentService.findBugCommentById(commentId));
         return bugCommentDtoModelAssembler.toModel(bugCommentDto);
     }
 
     @PostMapping
     public void createBugComment(
-            @Valid @RequestBody BugCommentDto bugCommentDto,
+            @Valid @RequestBody BugCommentRequestDto bugCommentRequestDto,
             @CurrentUser UserPrincipal currentUser) {
-        bugCommentService.createBugComment(bugCommentDto, currentUser.getUser());
+        bugCommentService.createBugComment(bugCommentRequestDto, currentUser.getUser());
     }
 
     @DeleteMapping("{commentId}")

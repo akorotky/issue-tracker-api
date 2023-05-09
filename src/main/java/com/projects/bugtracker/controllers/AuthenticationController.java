@@ -1,6 +1,10 @@
 package com.projects.bugtracker.controllers;
 
-import com.projects.bugtracker.dto.*;
+import com.projects.bugtracker.dto.authdto.AuthenticationRequestDto;
+import com.projects.bugtracker.dto.authdto.AuthenticationResponseDto;
+import com.projects.bugtracker.dto.tokendto.AccessTokenRequestDto;
+import com.projects.bugtracker.dto.tokendto.AccessTokenResponseDto;
+import com.projects.bugtracker.dto.userdto.UserRequestDto;
 import com.projects.bugtracker.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,24 +23,23 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
-    @PostMapping("/signup")
-    public ResponseEntity<AuthenticationResponse> signUp(@RequestBody UserDto userDto){
-        authenticationService.register(userDto);
-        URI createdUserLocation = linkTo(methodOn(UserController.class).getUser(userDto.username())).toUri();
+    @PostMapping("/register")
+    public ResponseEntity<AuthenticationResponseDto> signUp(@RequestBody UserRequestDto userRequestDto) {
+        authenticationService.register(userRequestDto);
+        URI createdUserLocation = linkTo(methodOn(UserController.class).getUser(userRequestDto.username())).toUri();
         return ResponseEntity.created(createdUserLocation).build();
     }
 
-    @PostMapping("/signin")
-    public ResponseEntity<AuthenticationResponse> signIn(@RequestBody AuthenticationRequest authenticationRequest){
-        AuthenticationResponse authenticationResponse = authenticationService.authenticate((authenticationRequest));
-        return ResponseEntity.ok(authenticationResponse);
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponseDto> signIn(@RequestBody AuthenticationRequestDto authenticationRequestDto) {
+        AuthenticationResponseDto authenticationResponseDto = authenticationService.authenticate((authenticationRequestDto));
+        return ResponseEntity.ok(authenticationResponseDto);
     }
 
     @PostMapping("/token")
-    public ResponseEntity<?> refreshAccessToken(@RequestBody AccessTokenRequest accessTokenRequest){
-        String accessToken = authenticationService.refreshAccessToken(accessTokenRequest);
-        if(accessToken == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Refresh token is invalid.");
-        return ResponseEntity.ok(new AccessTokenResponse(accessToken));
+    public ResponseEntity<?> refreshAccessToken(@RequestBody AccessTokenRequestDto accessTokenRequestDto) {
+        String accessToken = authenticationService.refreshAccessToken(accessTokenRequestDto);
+        if (accessToken == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Refresh token is invalid.");
+        return ResponseEntity.ok(new AccessTokenResponseDto(accessToken));
     }
-
 }

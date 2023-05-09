@@ -4,7 +4,7 @@ import com.projects.bugtracker.assemblers.ModelAssembler;
 import com.projects.bugtracker.controllers.BugController;
 import com.projects.bugtracker.controllers.ProjectController;
 import com.projects.bugtracker.controllers.UserController;
-import com.projects.bugtracker.dto.BugDto;
+import com.projects.bugtracker.dto.bugdto.BugResponseDto;
 import lombok.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
@@ -14,15 +14,15 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
-public class BugModelAssembler implements ModelAssembler<BugDto> {
+public class BugDtoModelAssembler implements ModelAssembler<BugResponseDto> {
 
     @Override
-    public @NonNull EntityModel<BugDto> toModel(BugDto bugDto) {
-        Long bugId = bugDto.id();
-        String username = bugDto.author().username();
-        Long projectId = bugDto.projectId();
+    public @NonNull EntityModel<BugResponseDto> toModel(BugResponseDto bugResponseDto) {
+        Long bugId = bugResponseDto.id();
+        String username = bugResponseDto.author().username();
+        Long projectId = bugResponseDto.projectId();
 
-        return EntityModel.of(bugDto,
+        return EntityModel.of(bugResponseDto,
                 linkTo(methodOn(BugController.class).getBug(bugId)).withSelfRel(),
                 linkTo(methodOn(UserController.class).getUser(username)).withRel("author"),
                 linkTo(methodOn(ProjectController.class).getProject(projectId)).withRel("project"),

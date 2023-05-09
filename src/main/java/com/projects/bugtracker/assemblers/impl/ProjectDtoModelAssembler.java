@@ -3,7 +3,7 @@ package com.projects.bugtracker.assemblers.impl;
 import com.projects.bugtracker.assemblers.ModelAssembler;
 import com.projects.bugtracker.controllers.ProjectController;
 import com.projects.bugtracker.controllers.UserController;
-import com.projects.bugtracker.dto.ProjectDto;
+import com.projects.bugtracker.dto.projectdto.ProjectResponseDto;
 import lombok.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
@@ -13,14 +13,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
-public class ProjectModelAssembler implements ModelAssembler<ProjectDto> {
+public class ProjectDtoModelAssembler implements ModelAssembler<ProjectResponseDto> {
 
     @Override
-    public @NonNull EntityModel<ProjectDto> toModel(ProjectDto projectDto) {
-        Long projectId = projectDto.id();
-        String username = projectDto.owner().username();
+    public @NonNull EntityModel<ProjectResponseDto> toModel(ProjectResponseDto projectResponseDto) {
+        Long projectId = projectResponseDto.id();
+        String username = projectResponseDto.owner().username();
 
-        return EntityModel.of(projectDto,
+        return EntityModel.of(projectResponseDto,
                 linkTo(methodOn(ProjectController.class).getProject(projectId)).withSelfRel(),
                 linkTo(methodOn(UserController.class).getUser(username)).withRel("owner"),
                 linkTo(methodOn(ProjectController.class).getAllCollaborators(projectId)).withRel("collaborators"),
