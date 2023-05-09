@@ -56,18 +56,8 @@ public class JwtTokenService {
         }
 
         Authentication authentication = getAuthentication(refreshToken, TokenType.REFRESH);
-        Claims claims = Jwts.claims().setSubject(authentication.getName());
-        claims.put("authorities", authentication.getAuthorities());
-
-        Date now = new Date();
-        Date expirationDate = new Date(now.getTime() + accessTokenValidityInMillis);
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(expirationDate)
-                .signWith(accessTokenKeyPair.getPrivate(), SignatureAlgorithm.ES256)
-                .compact();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return generateRefreshToken(userDetails);
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
