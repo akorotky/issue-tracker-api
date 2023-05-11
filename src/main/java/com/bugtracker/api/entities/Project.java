@@ -26,6 +26,9 @@ public class Project {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "private")
+    private Boolean isPrivate;
+
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Bug> bugs = new HashSet<>();
 

@@ -4,7 +4,7 @@ import com.bugtracker.api.entities.Role;
 
 public interface RoleDtoMapper {
 
-    RoleDto toDto(Role role);
-
-    Role toEntity(RoleDto roleDto);
+    default String mapRoleToString(Role role) {
+        return role.getName().name();
+    }
 }

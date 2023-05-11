@@ -20,8 +20,9 @@ CREATE TABLE "user" (
 
 CREATE TABLE project (
     id BIGSERIAL,
-    description TEXT NOT NULL,
     title varchar(255) NOT NULL,
+    description TEXT NOT NULL,
+    private BOOLEAN NOT NULL,
     user_id BIGINT NOT NULL,
     CONSTRAINT project_pkey PRIMARY KEY (id),
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES "user"(id)

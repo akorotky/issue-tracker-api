@@ -37,14 +37,12 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     @Override
     public String generateAccessToken(UserDetails userDetails) {
-        Claims claims = Jwts.claims().setSubject(userDetails.getUsername());
-        claims.put("authorities", userDetails.getAuthorities());
-
         Date now = new Date();
         Date expirationDate = new Date(now.getTime() + accessTokenValidityInMillis);
 
         return Jwts.builder()
-                .setClaims(claims)
+                .setSubject(userDetails.getUsername())
+                .claim("authorities", userDetails.getAuthorities())
                 .setIssuedAt(now)
                 .setExpiration(expirationDate)
                 .signWith(accessTokenKeyPair.getPrivate(), SignatureAlgorithm.ES256)

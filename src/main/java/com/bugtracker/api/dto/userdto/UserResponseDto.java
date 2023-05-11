@@ -1,6 +1,5 @@
 package com.bugtracker.api.dto.userdto;
 
-import com.bugtracker.api.dto.roledto.RoleDto;
 import org.springframework.hateoas.server.core.Relation;
 
 import java.util.Set;
@@ -10,6 +9,6 @@ public record UserResponseDto(
         Long id,
         String username,
         String email,
-        Set<RoleDto> roles
+        Set<String> roles
 ) {
 }
