@@ -5,7 +5,7 @@ import com.bugtracker.api.dto.authdto.AuthenticationRequestDto;
 import com.bugtracker.api.dto.authdto.AuthenticationResponseDto;
 import com.bugtracker.api.dto.tokendto.AccessTokenRequestDto;
 import com.bugtracker.api.services.AuthenticationService;
-import com.bugtracker.api.services.JwtTokenService;
+import com.bugtracker.api.security.jwt.JwtTokenService;
 import com.bugtracker.api.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

@@ -1,7 +1,5 @@
-package com.bugtracker.api.services.impl;
+package com.bugtracker.api.security.jwt;
 
-import com.bugtracker.api.enums.TokenType;
-import com.bugtracker.api.services.JwtTokenService;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -35,17 +33,27 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     private final UserDetailsService userDetailsService;
 
     @Override
-    public String generateAccessToken(UserDetails userDetails) {
+    public String generateToken(UserDetails userDetails, Key secretKey, SignatureAlgorithm signatureAlgorithm) {
         Date now = new Date(System.currentTimeMillis());
-        Date expirationDate = new Date(now.getTime() + accessTokenValidityInMillis);
+        Date expirationDate = new Date(now.getTime() + refreshTokenValidityInMillis);
 
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("authorities", userDetails.getAuthorities())
                 .setIssuedAt(now)
                 .setExpiration(expirationDate)
-                .signWith(accessTokenKeyPair.getPrivate(), SignatureAlgorithm.ES256)
+                .signWith(secretKey, signatureAlgorithm)
                 .compact();
+    }
+
+    @Override
+    public String generateAccessToken(UserDetails userDetails) {
+        return generateToken(userDetails, accessTokenKeyPair.getPrivate(), SignatureAlgorithm.ES256);
+    }
+
+    @Override
+    public String generateRefreshToken(UserDetails userDetails) {
+        return generateToken(userDetails, refreshTokenKeyPair.getPrivate(), SignatureAlgorithm.RS256);
     }
 
     @Override
@@ -59,20 +67,6 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         Authentication authentication = getAuthentication(refreshToken, TokenType.REFRESH);
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         return generateAccessToken(userDetails);
-    }
-
-    @Override
-    public String generateRefreshToken(UserDetails userDetails) {
-        Date now = new Date(System.currentTimeMillis());
-        Date expirationDate = new Date(now.getTime() + refreshTokenValidityInMillis);
-
-        return Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .claim("authorities", userDetails.getAuthorities())
-                .setIssuedAt(now)
-                .setExpiration(expirationDate)
-                .signWith(refreshTokenKeyPair.getPrivate(), SignatureAlgorithm.RS256)
-                .compact();
     }
 
     @Override

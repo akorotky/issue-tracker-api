@@ -1,5 +1,6 @@
 package com.bugtracker.api.entities;
 
+import com.bugtracker.api.entities.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
 

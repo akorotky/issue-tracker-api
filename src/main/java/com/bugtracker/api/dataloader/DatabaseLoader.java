@@ -1,10 +1,10 @@
-package com.bugtracker.api.db;
+package com.bugtracker.api.dataloader;
 
 import com.bugtracker.api.dto.projectdto.ProjectRequestDto;
 import com.bugtracker.api.dto.userdto.UserRequestDto;
-import com.bugtracker.api.entities.Role;
+import com.bugtracker.api.entities.role.Role;
 import com.bugtracker.api.entities.User;
-import com.bugtracker.api.enums.RoleType;
+import com.bugtracker.api.entities.role.RoleType;
 import com.bugtracker.api.exceptions.ResourceNotFoundException;
 import com.bugtracker.api.repositories.RoleRepository;
 import com.bugtracker.api.repositories.UserRepository;

@@ -1,6 +1,6 @@
-package com.bugtracker.api.services;
+package com.bugtracker.api.security.jwt;
 
-import com.bugtracker.api.enums.TokenType;
+import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.security.Key;
 
 public interface JwtTokenService {
+
+    String generateToken(UserDetails userDetails, Key key, SignatureAlgorithm signatureAlgorithm);
 
     String generateAccessToken(UserDetails userDetails);
 

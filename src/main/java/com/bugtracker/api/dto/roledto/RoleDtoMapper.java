@@ -1,6 +1,6 @@
 package com.bugtracker.api.dto.roledto;
 
-import com.bugtracker.api.entities.Role;
+import com.bugtracker.api.entities.role.Role;
 
 public interface RoleDtoMapper {
 

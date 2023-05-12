@@ -1,4 +1,4 @@
-package com.bugtracker.api.enums;
+package com.bugtracker.api.entities.role;
 
 public enum RoleType {
     USER,

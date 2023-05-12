@@ -1,5 +1,6 @@
-package com.bugtracker.api.security;
+package com.bugtracker.api.security.websecurity;
 
+import com.bugtracker.api.security.jwt.JwtTokenAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

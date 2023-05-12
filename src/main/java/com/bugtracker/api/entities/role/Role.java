@@ -1,6 +1,5 @@
-package com.bugtracker.api.entities;
+package com.bugtracker.api.entities.role;
 
-import com.bugtracker.api.enums.RoleType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

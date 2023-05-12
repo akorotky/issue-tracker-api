@@ -1,4 +1,4 @@
-package com.bugtracker.api.security;
+package com.bugtracker.api.security.passwordencoders;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

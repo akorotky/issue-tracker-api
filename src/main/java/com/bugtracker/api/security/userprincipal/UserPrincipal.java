@@ -1,4 +1,4 @@
-package com.bugtracker.api.security.principal;
+package com.bugtracker.api.security.userprincipal;
 
 import com.bugtracker.api.entities.User;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.bugtracker.api.enums;
+package com.bugtracker.api.security.jwt;
 
 public enum TokenType {
     ACCESS,
