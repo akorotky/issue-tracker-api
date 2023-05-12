@@ -15,6 +15,8 @@ CREATE TABLE "user" (
     account_enabled BOOLEAN,
     account_expired BOOLEAN,
     credentials_expired BOOLEAN,
+    created_date TIMESTAMP NOT NULL,
+    modified_date TIMESTAMP NOT NULL,
     CONSTRAINT user_pkey PRIMARY KEY (id)
 );
 
@@ -24,6 +26,8 @@ CREATE TABLE project (
     description TEXT NOT NULL,
     private BOOLEAN NOT NULL,
     user_id BIGINT NOT NULL,
+    created_date TIMESTAMP NOT NULL,
+    modified_date TIMESTAMP NOT NULL,
     CONSTRAINT project_pkey PRIMARY KEY (id),
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES "user"(id)
 );
@@ -44,6 +48,9 @@ CREATE TABLE bug (
     description TEXT,
     user_id BIGINT NOT NULL,
     project_id BIGINT NOT NULL,
+    created_date TIMESTAMP NOT NULL,
+    modified_date TIMESTAMP NOT NULL,
+    modified_by BIGINT NOT NULL,
     CONSTRAINT bug_pkey PRIMARY KEY (id),
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES "user"(id),
     CONSTRAINT fk_project FOREIGN KEY (project_id) REFERENCES project(id)
@@ -54,6 +61,8 @@ CREATE TABLE bug_comment (
     body TEXT NOT NULL,
     user_id BIGINT NOT NULL,
     bug_id BIGINT NOT NULL,
+    created_date TIMESTAMP NOT NULL,
+    modified_date TIMESTAMP NOT NULL,
     CONSTRAINT bug_comment_pkey PRIMARY KEY (id),
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES "user"(id),
     CONSTRAINT fk_bug FOREIGN KEY (bug_id) REFERENCES bug(id)

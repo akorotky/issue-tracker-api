@@ -2,6 +2,7 @@ package com.bugtracker.api.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.LastModifiedBy;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -13,7 +14,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Bug {
+public class Bug extends AuditMetadata {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +37,10 @@ public class Bug {
 
     @OneToMany(mappedBy = "bug", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<BugComment> comments = new HashSet<>();
+
+    @LastModifiedBy
+    @Column(name = "modified_by")
+    private Long modifiedBy;
 
     @Override
     public boolean equals(Object o) {

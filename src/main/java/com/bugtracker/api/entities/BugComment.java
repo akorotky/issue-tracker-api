@@ -11,7 +11,7 @@ import java.util.Objects;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BugComment {
+public class BugComment extends AuditMetadata {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

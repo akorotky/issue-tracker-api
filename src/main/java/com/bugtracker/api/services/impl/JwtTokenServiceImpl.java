@@ -2,7 +2,6 @@ package com.bugtracker.api.services.impl;
 
 import com.bugtracker.api.enums.TokenType;
 import com.bugtracker.api.services.JwtTokenService;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -18,7 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.security.*;
-import java.util.Date;
+import java.sql.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +36,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     @Override
     public String generateAccessToken(UserDetails userDetails) {
-        Date now = new Date();
+        Date now = new Date(System.currentTimeMillis());
         Date expirationDate = new Date(now.getTime() + accessTokenValidityInMillis);
 
         return Jwts.builder()
@@ -64,12 +63,12 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     @Override
     public String generateRefreshToken(UserDetails userDetails) {
-        Claims claims = Jwts.claims().setSubject(userDetails.getUsername());
-        Date now = new Date();
+        Date now = new Date(System.currentTimeMillis());
         Date expirationDate = new Date(now.getTime() + refreshTokenValidityInMillis);
 
         return Jwts.builder()
-                .setClaims(claims)
+                .setSubject(userDetails.getUsername())
+                .claim("authorities", userDetails.getAuthorities())
                 .setIssuedAt(now)
                 .setExpiration(expirationDate)
                 .signWith(refreshTokenKeyPair.getPrivate(), SignatureAlgorithm.RS256)
