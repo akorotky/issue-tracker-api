@@ -5,9 +5,7 @@ import com.bugtracker.api.dto.userdto.UserRequestDto;
 import com.bugtracker.api.entities.role.Role;
 import com.bugtracker.api.entities.User;
 import com.bugtracker.api.entities.role.RoleType;
-import com.bugtracker.api.exceptions.ResourceNotFoundException;
 import com.bugtracker.api.repositories.RoleRepository;
-import com.bugtracker.api.repositories.UserRepository;
 import com.bugtracker.api.services.ProjectService;
 import com.bugtracker.api.services.UserService;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -17,6 +15,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -26,7 +25,28 @@ public class DatabaseLoader implements CommandLineRunner {
     private final UserService userService;
     private final RoleRepository roleRepository;
     private final ProjectService projectService;
-    private final UserRepository userRepository;
+
+    private void initRoles() {
+        RoleType[] roles = {RoleType.USER, RoleType.ADMIN};
+
+        for (RoleType role : roles) {
+            roleRepository.save(new Role(role));
+        }
+    }
+
+    private List<User> initUsers(List<UserRequestDto> userRequestDtoList) {
+        List<User> users = new ArrayList<>();
+        for (UserRequestDto userRequestDto : userRequestDtoList) {
+            users.add(userService.createUser(userRequestDto));
+        }
+        return users;
+    }
+
+    private void initProjects(List<ProjectRequestDto> projectRequestDtoList, List<User> userList) {
+        for (int i = 0; i < projectRequestDtoList.size() && i < userList.size(); i++) {
+            projectService.createProject(projectRequestDtoList.get(i), userList.get(i));
+        }
+    }
 
     @Override
     public void run(String... strings) throws Exception {
@@ -34,39 +54,21 @@ public class DatabaseLoader implements CommandLineRunner {
         String PROJECTS_DATA_LOCATION = "src/main/resources/data/projects.json";
         String USERS_DATA_LOCATION = "src/main/resources/data/users.json";
 
-        // Jackson object mapper
+        // initialize Jackson object mapper
         ObjectMapper objectMapper = new ObjectMapper();
 
         // load data from the json files into DTOs
-        List<ProjectRequestDto> projectList = objectMapper.readValue(
-                new File(PROJECTS_DATA_LOCATION),
-                new TypeReference<List<ProjectRequestDto>>() {
-                });
-
-        List<UserRequestDto> userList = objectMapper.readValue(
+        List<UserRequestDto> userRequestDtoList = objectMapper.readValue(
                 new File(USERS_DATA_LOCATION),
                 new TypeReference<List<UserRequestDto>>() {
                 });
 
-        // create roles
-        RoleType[] roles = {RoleType.USER, RoleType.ADMIN};
+        List<ProjectRequestDto> projectRequestDtoList = objectMapper.readValue(
+                new File(PROJECTS_DATA_LOCATION),
+                new TypeReference<List<ProjectRequestDto>>() {
+                });
 
-        // save roles to the database
-        for (RoleType role : roles) {
-            roleRepository.save(new Role(role));
-        }
-
-        for (int i = 0; i < userList.size(); i++) {
-            // create a new user
-            userService.createUser(userList.get(i));
-
-            // load the user from the database
-            String username = userList.get(i).username();
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-
-            // create a new project with the selected user as owner
-            projectService.createProject(projectList.get(i), user);
-        }
+        initRoles();
+        initProjects(projectRequestDtoList, initUsers(userRequestDtoList));
     }
 }

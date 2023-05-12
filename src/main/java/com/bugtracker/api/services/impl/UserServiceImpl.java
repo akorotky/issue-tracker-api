@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void createUser(UserRequestDto userRequestDto) {
+    public User createUser(UserRequestDto userRequestDto) {
         User user = userDtoMapper.toEntity(userRequestDto);
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -75,7 +75,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setAccountExpired(false);
         user.setCredentialsExpired(false);
 
-        userRepository.save(user);
+        userRepository.saveAndFlush(user);
+        return user;
     }
 
     @Override

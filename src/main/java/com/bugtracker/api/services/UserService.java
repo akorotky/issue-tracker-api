@@ -20,7 +20,7 @@ public interface UserService {
 
     Page<User> findAllUsers(Pageable pageable);
 
-    void createUser(UserRequestDto userRequestDto);
+    User createUser(UserRequestDto userRequestDto);
 
     void updateUser(UserRequestDto userRequestDto);
 
