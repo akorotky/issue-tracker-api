@@ -1,4 +1,4 @@
-package com.bugtracker.api.security.audit;
+package com.bugtracker.api.security.jpaaudit;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

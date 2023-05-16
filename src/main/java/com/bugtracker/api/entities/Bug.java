@@ -1,5 +1,6 @@
 package com.bugtracker.api.entities;
 
+import com.bugtracker.api.entities.audit.AuditMetadata;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.LastModifiedBy;

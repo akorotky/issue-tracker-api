@@ -1,4 +1,4 @@
-package com.bugtracker.api.security.audit;
+package com.bugtracker.api.security.jpaaudit;
 
 import com.bugtracker.api.entities.User;
 import lombok.NonNull;

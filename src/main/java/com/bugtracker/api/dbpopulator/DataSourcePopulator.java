@@ -1,4 +1,4 @@
-package com.bugtracker.api.dataloader;
+package com.bugtracker.api.dbpopulator;
 
 import com.bugtracker.api.dto.projectdto.ProjectRequestDto;
 import com.bugtracker.api.dto.userdto.UserRequestDto;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class DatabaseLoader implements CommandLineRunner {
+public class DataSourcePopulator implements CommandLineRunner {
 
     private final UserService userService;
     private final RoleRepository roleRepository;

@@ -1,4 +1,4 @@
-package com.bugtracker.api.entities;
+package com.bugtracker.api.entities.audit;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
