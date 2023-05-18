@@ -6,10 +6,10 @@ import com.bugtracker.api.dto.bugcommentdto.BugCommentResponseDto;
 import com.bugtracker.api.dto.bugdto.BugDtoMapper;
 import com.bugtracker.api.dto.bugdto.BugRequestDto;
 import com.bugtracker.api.dto.bugdto.BugResponseDto;
-import com.bugtracker.api.security.userprincipal.CurrentUser;
+import com.bugtracker.api.security.principal.CurrentUser;
 import com.bugtracker.api.services.BugCommentService;
 import com.bugtracker.api.services.BugService;
-import com.bugtracker.api.security.userprincipal.UserPrincipal;
+import com.bugtracker.api.security.principal.UserPrincipal;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -48,7 +48,7 @@ public class BugController {
 
     @PostMapping
     public void createBug(@Valid @RequestBody BugRequestDto bugRequestDto, @CurrentUser UserPrincipal currentUser) {
-        bugService.createBug(bugRequestDto, currentUser.getUser());
+        bugService.createBug(bugRequestDto, currentUser.user());
     }
 
     @DeleteMapping("{bugId}")

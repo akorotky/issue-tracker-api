@@ -3,7 +3,7 @@ package com.bugtracker.api.controllers;
 import com.bugtracker.api.dto.bugdto.BugResponseDto;
 import com.bugtracker.api.dto.projectdto.ProjectRequestDto;
 import com.bugtracker.api.dto.projectdto.ProjectResponseDto;
-import com.bugtracker.api.security.userprincipal.CurrentUser;
+import com.bugtracker.api.security.principal.CurrentUser;
 import com.bugtracker.api.services.BugService;
 import com.bugtracker.api.services.ProjectService;
 import com.bugtracker.api.assemblers.ModelAssembler;
@@ -11,7 +11,7 @@ import com.bugtracker.api.dto.bugdto.BugDtoMapper;
 import com.bugtracker.api.dto.projectdto.ProjectDtoMapper;
 import com.bugtracker.api.dto.userdto.UserDtoMapper;
 import com.bugtracker.api.dto.userdto.UserResponseDto;
-import com.bugtracker.api.security.userprincipal.UserPrincipal;
+import com.bugtracker.api.security.principal.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -78,7 +78,7 @@ public class ProjectController {
 
     @PostMapping
     public void createProject(@RequestBody ProjectRequestDto project, @CurrentUser UserPrincipal currentUser) {
-        projectService.createProject(project, currentUser.getUser());
+        projectService.createProject(project, currentUser.user());
     }
 
     @GetMapping("{projectId}/collaborators")

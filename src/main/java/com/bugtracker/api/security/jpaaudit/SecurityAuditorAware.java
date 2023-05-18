@@ -1,6 +1,6 @@
 package com.bugtracker.api.security.jpaaudit;
 
-import com.bugtracker.api.entities.User;
+import com.bugtracker.api.security.principal.UserPrincipal;
 import lombok.NonNull;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;
@@ -17,8 +17,8 @@ class SecurityAuditorAware implements AuditorAware<Long> {
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated)
                 .map(Authentication::getPrincipal)
-                .map(User.class::cast)
-                .map(User::getId);
+                .map(UserPrincipal.class::cast)
+                .map(UserPrincipal::getId);
     }
 }
 

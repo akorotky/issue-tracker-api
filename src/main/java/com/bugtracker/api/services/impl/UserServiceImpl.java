@@ -11,7 +11,7 @@ import com.bugtracker.api.repositories.RoleRepository;
 import com.bugtracker.api.repositories.UserRepository;
 import com.bugtracker.api.services.UserService;
 import com.bugtracker.api.entities.Bug;
-import com.bugtracker.api.security.userprincipal.UserPrincipal;
+import com.bugtracker.api.security.principal.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

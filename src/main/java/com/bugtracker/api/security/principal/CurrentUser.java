@@ -1,4 +1,4 @@
-package com.bugtracker.api.security.userprincipal;
+package com.bugtracker.api.security.principal;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 

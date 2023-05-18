@@ -4,9 +4,9 @@ import com.bugtracker.api.assemblers.ModelAssembler;
 import com.bugtracker.api.dto.bugcommentdto.BugCommentDtoMapper;
 import com.bugtracker.api.dto.bugcommentdto.BugCommentRequestDto;
 import com.bugtracker.api.dto.bugcommentdto.BugCommentResponseDto;
-import com.bugtracker.api.security.userprincipal.CurrentUser;
+import com.bugtracker.api.security.principal.CurrentUser;
 import com.bugtracker.api.services.BugCommentService;
-import com.bugtracker.api.security.userprincipal.UserPrincipal;
+import com.bugtracker.api.security.principal.UserPrincipal;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -43,7 +43,7 @@ public class BugCommentController {
     public void createBugComment(
             @Valid @RequestBody BugCommentRequestDto bugCommentRequestDto,
             @CurrentUser UserPrincipal currentUser) {
-        bugCommentService.createBugComment(bugCommentRequestDto, currentUser.getUser());
+        bugCommentService.createBugComment(bugCommentRequestDto, currentUser.user());
     }
 
     @DeleteMapping("{commentId}")
