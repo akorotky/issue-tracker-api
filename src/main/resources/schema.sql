@@ -29,7 +29,7 @@ CREATE TABLE project (
     created_date TIMESTAMP NOT NULL,
     modified_date TIMESTAMP NOT NULL,
     PRIMARY KEY (id),
-    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES "user"(id)
+    CONSTRAINT fk_user_project FOREIGN KEY (user_id) REFERENCES "user"(id)
 );
 
 CREATE TABLE project_user (
@@ -38,8 +38,8 @@ CREATE TABLE project_user (
     FOREIGN KEY (user_id) REFERENCES "user"(id),
     FOREIGN KEY (project_id) REFERENCES project(id),
     PRIMARY KEY (project_id, user_id),
-    CONSTRAINT fk_project FOREIGN KEY (project_id) REFERENCES project(id),
-    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES "user"(id)
+    CONSTRAINT fk_project_project_user FOREIGN KEY (project_id) REFERENCES project(id),
+    CONSTRAINT fk_user_project_user FOREIGN KEY (user_id) REFERENCES "user"(id)
 );
 
 CREATE TABLE bug (
@@ -52,8 +52,8 @@ CREATE TABLE bug (
     modified_date TIMESTAMP NOT NULL,
     modified_by BIGINT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES "user"(id),
-    FOREIGN KEY (project_id) REFERENCES project(id)
+    CONSTRAINT fk_user_bug FOREIGN KEY (user_id) REFERENCES "user"(id),
+    CONSTRAINT fk_project_bug FOREIGN KEY (project_id) REFERENCES project(id)
 );
 
 CREATE TABLE bug_comment (
@@ -64,8 +64,8 @@ CREATE TABLE bug_comment (
     created_date TIMESTAMP NOT NULL,
     modified_date TIMESTAMP NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES "user"(id),
-    FOREIGN KEY (bug_id) REFERENCES bug(id)
+    CONSTRAINT fk_user_bug_comment FOREIGN KEY (user_id) REFERENCES "user"(id),
+    CONSTRAINT fk_bug_bug_comment FOREIGN KEY (bug_id) REFERENCES bug(id)
 );
 
 CREATE TABLE role (
@@ -81,8 +81,8 @@ CREATE TABLE user_role (
     FOREIGN KEY (user_id) REFERENCES "user"(id),
     FOREIGN KEY (role_id) REFERENCES role(id),
     PRIMARY KEY (role_id, user_id),
-    FOREIGN KEY (user_id) REFERENCES "user"(id),
-    FOREIGN KEY (role_id) REFERENCES role(id)
+    CONSTRAINT fk_user_user_role FOREIGN KEY (user_id) REFERENCES "user"(id),
+    CONSTRAINT fk_role_user_role FOREIGN KEY (role_id) REFERENCES role(id)
 );
 
 --Postgres ACL tables
