@@ -23,12 +23,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserService userService;
 
     @Override
-    public AuthenticationResponseDto authenticate(AuthenticationRequestDto authenticationRequestDto) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
+    public AuthenticationResponseDto authenticateUser(AuthenticationRequestDto authenticationRequestDto) {
+        Authentication authentication = getAuthenticationFromUsernamePassword(
                         authenticationRequestDto.username(),
                         authenticationRequestDto.password()
-                )
         );
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
@@ -38,7 +36,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void register(UserRequestDto userRequestDto) {
+    public Authentication getAuthenticationFromUsernamePassword(String username, String password) {
+        return authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(username, password)
+        );
+    }
+
+    @Override
+    public void registerUser(UserRequestDto userRequestDto) {
         userService.createUser(userRequestDto);
     }
 

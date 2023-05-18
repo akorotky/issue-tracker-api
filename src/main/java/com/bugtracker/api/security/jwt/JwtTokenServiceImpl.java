@@ -1,5 +1,6 @@
 package com.bugtracker.api.security.jwt;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -10,12 +11,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.security.*;
 import java.sql.Date;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -25,21 +28,25 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     private final KeyPair refreshTokenKeyPair = Keys.keyPairFor(SignatureAlgorithm.RS256);
 
     @Value("${security.jwt.access-token.expire-length:900000}") // 15 min
-    private long accessTokenValidityInMillis;
+    private Long accessTokenValidityInMillis;
 
     @Value("${security.jwt.refresh-token.expire-length:604800000}") // 1 week
-    private long refreshTokenValidityInMillis;
-
-    private final UserDetailsService userDetailsService;
+    private Long refreshTokenValidityInMillis;
 
     @Override
-    public String generateToken(UserDetails userDetails, Key secretKey, SignatureAlgorithm signatureAlgorithm) {
+    public String generateToken(
+            UserDetails userDetails,
+            Key secretKey,
+            SignatureAlgorithm signatureAlgorithm,
+            Long validityInMillis
+    ) {
         Date now = new Date(System.currentTimeMillis());
-        Date expirationDate = new Date(now.getTime() + refreshTokenValidityInMillis);
+        Date expirationDate = new Date(now.getTime() + validityInMillis);
+        List<String> authorities = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
 
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
-                .claim("authorities", userDetails.getAuthorities())
+                .claim("authorities", authorities)
                 .setIssuedAt(now)
                 .setExpiration(expirationDate)
                 .signWith(secretKey, signatureAlgorithm)
@@ -48,12 +55,22 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     @Override
     public String generateAccessToken(UserDetails userDetails) {
-        return generateToken(userDetails, accessTokenKeyPair.getPrivate(), SignatureAlgorithm.ES256);
+        return generateToken(
+                userDetails,
+                accessTokenKeyPair.getPrivate(),
+                SignatureAlgorithm.ES256,
+                accessTokenValidityInMillis
+        );
     }
 
     @Override
     public String generateRefreshToken(UserDetails userDetails) {
-        return generateToken(userDetails, refreshTokenKeyPair.getPrivate(), SignatureAlgorithm.RS256);
+        return generateToken(
+                userDetails,
+                refreshTokenKeyPair.getPrivate(),
+                SignatureAlgorithm.RS256,
+                refreshTokenValidityInMillis
+        );
     }
 
     @Override
@@ -71,9 +88,13 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     @Override
     public Authentication getAuthentication(String token, TokenType tokenType) {
-        String username = extractUsernameFromToken(token, tokenType);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        Claims claims = extractClaimsFromToken(token, tokenType);
+        String username = claims.getSubject();
+
+        @SuppressWarnings("unchecked")
+        List<String> authorities = claims.get("authorities", ArrayList.class);
+        List<SimpleGrantedAuthority> grantedAuthorities = authorities.stream().map(SimpleGrantedAuthority::new).toList();
+        return new UsernamePasswordAuthenticationToken(username, null, grantedAuthorities);
     }
 
     @Override
@@ -85,9 +106,9 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     @Override
-    public String extractUsernameFromToken(String token, TokenType tokenType) {
+    public Claims extractClaimsFromToken(String token, TokenType tokenType) {
         Key key = getTokenPublicKey(tokenType);
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
 
     @Override
@@ -107,5 +128,4 @@ public class JwtTokenServiceImpl implements JwtTokenService {
             throw new JwtException("Expired or invalid JWT token");
         }
     }
-
 }

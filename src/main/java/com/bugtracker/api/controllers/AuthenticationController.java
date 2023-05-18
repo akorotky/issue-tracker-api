@@ -25,14 +25,14 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponseDto> signUp(@RequestBody UserRequestDto userRequestDto) {
-        authenticationService.register(userRequestDto);
+        authenticationService.registerUser(userRequestDto);
         URI createdUserLocation = linkTo(methodOn(UserController.class).getUser(userRequestDto.username())).toUri();
         return ResponseEntity.created(createdUserLocation).build();
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponseDto> signIn(@RequestBody AuthenticationRequestDto authenticationRequestDto) {
-        AuthenticationResponseDto authenticationResponseDto = authenticationService.authenticate((authenticationRequestDto));
+        AuthenticationResponseDto authenticationResponseDto = authenticationService.authenticateUser((authenticationRequestDto));
         return ResponseEntity.ok(authenticationResponseDto);
     }
 
