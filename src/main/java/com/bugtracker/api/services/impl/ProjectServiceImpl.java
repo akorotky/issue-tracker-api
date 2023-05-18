@@ -6,11 +6,13 @@ import com.bugtracker.api.entities.Project;
 import com.bugtracker.api.entities.User;
 import com.bugtracker.api.exceptions.ResourceNotFoundException;
 import com.bugtracker.api.repositories.UserRepository;
+import com.bugtracker.api.security.acl.AclPermissionServiceImpl;
 import com.bugtracker.api.services.ProjectService;
 import com.bugtracker.api.repositories.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +24,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final ProjectDtoMapper projectDtoMapper;
+    private final AclPermissionServiceImpl aclPermissionServiceImpl;
 
     @Override
     public Page<Project> findAllProjects(Pageable pageable) {
@@ -52,7 +55,9 @@ public class ProjectServiceImpl implements ProjectService {
     public void createProject(ProjectRequestDto projectRequestDto, User user) {
         Project project = projectDtoMapper.toEntity(projectRequestDto);
         project.setOwner(user);
-        projectRepository.save(project);
+        projectRepository.saveAndFlush(project);
+        // grant project owner admin permissions
+        aclPermissionServiceImpl.grantPermissions(project, project.getId(), user.getUsername(), BasePermission.ADMINISTRATION);
     }
 
     @Override

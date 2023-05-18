@@ -3,6 +3,7 @@ package com.bugtracker.api.controllers;
 import com.bugtracker.api.dto.bugdto.BugResponseDto;
 import com.bugtracker.api.dto.projectdto.ProjectRequestDto;
 import com.bugtracker.api.dto.projectdto.ProjectResponseDto;
+import com.bugtracker.api.security.permissions.project.ProjectAdminPermission;
 import com.bugtracker.api.security.principal.CurrentUser;
 import com.bugtracker.api.services.BugService;
 import com.bugtracker.api.services.ProjectService;
@@ -65,12 +66,13 @@ public class ProjectController {
         ProjectResponseDto project = projectDtoMapper.toDto(projectService.findProjectById(projectId));
         return projectDtoModelAssembler.toModel(project);
     }
-
+    @ProjectAdminPermission
     @PatchMapping("{projectId}")
     public void updateProject(@RequestBody ProjectRequestDto project, @PathVariable Long projectId) {
         projectService.updateProject(project, projectId);
     }
 
+    @ProjectAdminPermission
     @DeleteMapping("{projectId}")
     public void deleteProject(@PathVariable Long projectId) {
         projectService.deleteProjectById(projectId);
@@ -91,11 +93,13 @@ public class ProjectController {
         return CollectionModel.of(collaborators, linkTo(methodOn(ProjectController.class).getAllCollaborators(projectId)).withSelfRel());
     }
 
+    @ProjectAdminPermission
     @PutMapping("{projectId}/collaborators/{username}")
     public void addCollaborator(@PathVariable Long projectId, @PathVariable String username) {
         projectService.addProjectCollaborator(projectId, username);
     }
 
+    @ProjectAdminPermission
     @DeleteMapping("{projectId}/collaborators/{username}")
     public void removeCollaborator(@PathVariable Long projectId, @PathVariable String username) {
         projectService.removeProjectCollaborator(projectId, username);

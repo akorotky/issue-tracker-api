@@ -3,19 +3,21 @@ package com.bugtracker.api.dbpopulator;
 import com.bugtracker.api.dto.projectdto.ProjectRequestDto;
 import com.bugtracker.api.dto.userdto.UserRequestDto;
 import com.bugtracker.api.entities.role.Role;
-import com.bugtracker.api.entities.User;
 import com.bugtracker.api.entities.role.RoleType;
 import com.bugtracker.api.repositories.RoleRepository;
+import com.bugtracker.api.security.principal.UserPrincipal;
+import com.bugtracker.api.services.AuthenticationService;
 import com.bugtracker.api.services.ProjectService;
 import com.bugtracker.api.services.UserService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -25,6 +27,7 @@ public class DataSourcePopulator implements CommandLineRunner {
     private final UserService userService;
     private final RoleRepository roleRepository;
     private final ProjectService projectService;
+    private final AuthenticationService authenticationService;
 
     private void initRoles() {
         RoleType[] roles = {RoleType.USER, RoleType.ADMIN};
@@ -34,19 +37,29 @@ public class DataSourcePopulator implements CommandLineRunner {
         }
     }
 
-    private List<User> initUsers(List<UserRequestDto> userRequestDtoList) {
-        List<User> users = new ArrayList<>();
+    private void initUsers(List<UserRequestDto> userRequestDtoList) {
         for (UserRequestDto userRequestDto : userRequestDtoList) {
-            users.add(userService.createUser(userRequestDto));
+            userService.createUser(userRequestDto);
         }
-        return users;
     }
 
-    private void initProjects(List<ProjectRequestDto> projectRequestDtoList, List<User> userList) {
-        for (int i = 0; i < projectRequestDtoList.size() && i < userList.size(); i++) {
-            projectService.createProject(projectRequestDtoList.get(i), userList.get(i));
+    private void initProjects(List<ProjectRequestDto> projectRequestDtoList, List<UserRequestDto> userRequestDtoList) {
+        for (int i = 0; i < projectRequestDtoList.size() && i < userRequestDtoList.size(); i++) {
+            UserRequestDto userRequestDto = userRequestDtoList.get(i);
+            // JdbcMutableAclService requires the user to be authenticated in order to work
+            Authentication authentication = authenticationService.getAuthenticationFromUsernamePassword(
+                    userRequestDto.username(),
+                    userRequestDto.password()
+            );
+            UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            // create projects
+            projectService.createProject(projectRequestDtoList.get(i), userPrincipal.user());
+            // clear context
+            SecurityContextHolder.clearContext();
         }
     }
+
 
     @Override
     public void run(String... strings) throws Exception {
@@ -69,6 +82,7 @@ public class DataSourcePopulator implements CommandLineRunner {
                 });
 
         initRoles();
-        initProjects(projectRequestDtoList, initUsers(userRequestDtoList));
+        initUsers(userRequestDtoList);
+        initProjects(projectRequestDtoList, userRequestDtoList);
     }
 }

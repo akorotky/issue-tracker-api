@@ -20,6 +20,7 @@
         <io.jsonwebtoken.version>0.11.5</io.jsonwebtoken.version>
         <org.apache.maven.plugins.version>3.11.0</org.apache.maven.plugins.version>
         <org.projectlombok.version>1.18.26</org.projectlombok.version>
+        <jedis.version>4.4.0</jedis.version>
     </properties>
     <dependencies>
         <dependency>
@@ -93,12 +94,25 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
             <version>${io.jsonwebtoken.version}</version>
-            <scope>runtime</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${org.mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-acl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>${jedis.version}</version>
         </dependency>
     </dependencies>
 
