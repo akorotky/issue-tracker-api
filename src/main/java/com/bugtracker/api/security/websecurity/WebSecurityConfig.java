@@ -1,5 +1,6 @@
 package com.bugtracker.api.security.websecurity;
 
+import com.bugtracker.api.security.jwt.JwtAuthenticationEntryPoint;
 import com.bugtracker.api.security.jwt.JwtTokenAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,9 +20,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
+
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenAuthenticationFilter jwtTokenAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final String[] WHITELIST = {
             /* DEV */
             "/error", // Enable Error Tracing
@@ -48,7 +51,9 @@ public class WebSecurityConfig {
                 .authenticated()
                 .and()
                 .authenticationProvider(daoAuthenticationProvider())
-                .addFilterBefore(jwtTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint);
 
         return http.build();
     }
