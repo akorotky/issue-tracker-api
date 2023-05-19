@@ -1,13 +1,27 @@
-# About
+# About the Project
+Bugtracker is an open-source web application that enables developers to collaborate, manage projects, track bugs, and foster communication within their team. Conceptually inspired by the architectural design of GitHub, Bugtracker aims to deliver a robust platform where individuals and teams can plan, develop, and deliver software effectively. This project was developed for educational purposes, and serves to provide an example of what an enterprise-grade Java-based Spring Boot application with REST API for bug tracking might look like.
+
+# About This Repository
 This repository contains the code for the backend of the full-stack Bugtracker project. <br>
 The frontend code can be found in the following [repository](https://github.com/skorotky/bugtracker-client).
 
-# Tech Stack
+# Features (in-progress)
+Bugtracker offers a comprehensive set of features designed to optimize the software development lifecycle:
+
+* **Project Management:** Create and manage your software projects with ease. You can add or remove project collaborators and customize the project visibility, making your project visibile to users outside of your project, or making it private so that only the project owner and collaborators can see and access it. 
+
+* **Code Bug Tracking:** A built-in bug tracking system that allows users to report, track, and resolve bugs. Each bug report can be categorized, prioritized, and assigned to team members.
+
+* **Comments and Collaboration:** A collaborative space where team members can share their ideas, give feedback, and discuss project and bug specifics.
+
+* **Privacy and Security:** Required authentification and customizable fine-grained access control ensures that only certain types of users can interact with your projects, providing a high level of security and privacy. 
+
+# Technology Stack
 * **Languages**: Java 19
-* **Frameworks:** Spring Boot
+* **Frameworks:** Spring/Spring Boot
 * **Build tools:** Maven
 * **Servers:** Tomcat
-* **Databases:** PostgreSQL
+* **Databases:** PostgreSQL, Redis
 
 # Dependencies
 <ul type="square">
@@ -21,35 +35,118 @@ The frontend code can be found in the following [repository](https://github.com/
   <li>Lombok</li>
   <li>Jackson Databind</li>
   <li>SpringDoc OpenAPI WebMVC UI</li>
+  <li>Mapstruct</li>
+  <li>JJWT</li>
+  <li>Spring Data Redis</li>
+  <li>Jedis</li>
+  <li>Spring Security ACL</li>
 </ul>
 
-# API Features
+# API Components
 * REST API
-* Authentication (Basic)
-* Authorization 
+* Authentication & authorization (JWT)
+* OpenAPI documentation with Swagger UI playground
 
-# Project Functionalities
-- [ ] User registration 
-- [x] User authentication
-- [ ] Endpoint access control based on user roles/privileges 
-- [x] Users can create, update, and delete projects  
-- [ ] Project owners can configure their project visibility (private vs. public)
-- [x] Project owners can add to or remove collaborators from their project
-- [x] Inside the project, users can create, update, and delete bug reports
-- [x] Users can leave comments under bug reports and update/delete them
-- [x] Collection resource pagination
+# Project Todos
+:white_check_mark: Enable user registration <br>
+:white_check_mark: Force user authentication & authorization (Json Web Token) <br>
+:white_check_mark: Allow users to create, update, and delete projects <br>
+:white_check_mark: Allow project owners to add and remove collaborators from their project <br>
+:white_check_mark: Allow the project owner and collaborators to create, update, and delete bug reports <br>
+:white_check_mark: Allow the project owner and collaborators to leave comments under bug reports and update/delete them <br>
+:white_check_mark: Enable resource pagination (to avoid fetching and displaying too much data at once) <br> 
+:white_check_mark: Add mock data
+:soon: Allow project owners to configure their project visibility (private vs. public) <br>
+:soon: Enable fine-grained access control based on user roles/privileges using ACL and Redis cache <br>
+:soon: Add proper error handling <br>
+:soon: Configure proper API response statuses <br>
+:soon: Configure proper media types for requests and responses
+:soon: Containerize the application using Docker <br>
+:soon: Allow JWT refresh tokens to be stored in cache <br>
+:soon: Configure CORS and CSRF <br>
+:soon: Configure user role hierarchy <br>
+:soon: Enable user logout <br>
+:soon: Enable full-text database search <br>
+:soon: Add unit & integration testing <br>
 
-# Installation 
-1. ```git clone https://github.com/skorotky/bugtracker-api.git```  
-2. ```cd bugtracker-api ```  
-3. In the ```application.properties``` file, put your own PostgreSQL credentials.
-4. Run the Spring Boot application.
-5. Open http://localhost:8080/ in the browser.
-6. Navigate to ```/api/**``` routes to see the API.
-7. To authenticate, enter ```user``` for username and ```password``` for password in the pop-up window.
+# API Documentation 
+You can acess the OpenAPI Specification of the Bugtracker API in JSON format at http://localhost:8080/v3/api-docs. 
 
-# API Documentation & Testing
-You can acess the OpenAPI Specification of the Bugtracker API in JSON format at http://localhost:8080/v3/api-docs. <br>
-You can also download the documentation as a YAML file from http://localhost:8080/v3/api-docs.yaml.
+You can also download the documentation as a YAML file from http://localhost:8080/v3/api-docs.yaml. 
 
 You can explore and play with the Bugtracker API in an interactive environment generated by Swagger UI at http://localhost:8080/swagger-ui.html.
+
+# Installation 
+### 1. Prerequisites
+You need to have PostgreSQL and Redis servers set-up and running in order to run this application.
+### 2. Clone the repository
+```git clone https://github.com/skorotky/bugtracker-api.git```  
+### 3. Enter the project folder
+```cd bugtracker-api``` 
+### 4. Customize the application properties
+In the ```application.properties``` file, put your PostgreSQL credentials. You can also add or remove other properties if you like.
+### 5. Run the application
+You can run the application using an IDE of your choice (i.e. IntelliJ), or with the command line ```mvn spring-boot:run``` (you need to have Maven installed). The application server will start at http://localhost:8080.
+### 6. Authentization and authorization
+Since the application is secured, you need to authenticate first in order to access the API. You can do that using [Postman](https://www.postman.com/downloads/) (best experience) or using the Linux [curl](https://curl.se/) CLI tool. 
+
+A mock user with username ```user``` and password ```password``` already exists, so you can use these credentials to authenticate. To do that, you need to send a HTTP POST request to ```http://localhost:8080/api/auth/login``` with a valid username and password.
+
+#### Example request: 
+```json
+{
+    "username": "user",
+    "password": "password"
+}
+```
+
+#### Example response:
+
+```json
+{
+    "accessToken": "eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwiYXV0aG9yaXRpZXMiOlsiVVNFUiJdLCJpYXQiOjE2ODQ0NjM5MzQsImV4cCI6MTY4NDQ2NDgzNH0.LLkEf3QfkYWr_gOxt4jwCTg5leXqy85BMb5VqrIfJS0ma2RqZVyfaGE3Tlckt5CdKRTSdvUv3eUeMWlrjDwspA",
+    "refreshToken": "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwiYXV0aG9yaXRpZXMiOlsiVVNFUiJdLCJpYXQiOjE2ODQ0NjM5MzQsImV4cCI6MTY4NTA2ODczNH0.qfttGoaNLTaG17OGIncP5S3_D9sGLvaw6pDwCtlDY8oqQULuGKm3FH7xHIZjkTUjOZP71xXWXAIXCkw94x_mNIAt5uK59_ZnY-vce5sj03C0VGQBHfIzZsfk_di9K8uH7rd6HckGizl_vG4kUgUpnmzER5qN97G0_D-7f1kRToyO1ud6_X7phd7bN1PCqJBdBYm4KcV3lP3_gVmNvV-upahTSlR5XTYX4DZu828DGVemYZed72UN7kazvd4pXwQ1wwcR9T7JEo3pexZpoYB5Mnhgq1hW6iWEbX9P6RoOHQOIafOy1E9lF76Jh_nMCe65cAw-a7ErZsHg-aLn3V4vGw"
+}
+```
+
+Example using curl: ```curl -X POST -H http://localhost:8080/api/auth/login "Content-Type: application/json" -d '"username":"user", "password":"password"'```
+
+Access token is a short-lived Json Web Token (the token is valid only for 15 minutes) that you can put into the HTTP Authorization header when accessing the API, in order to avoid always sending username and password on every request. When the access token expires, you can use the refresh token (valid for 1 week) to generate a new access token by sending a POST request to the ```http://localhost:8080/api/auth/token``` endpoint with the refresh token in the request body.
+
+# RESTful API Example:
+
+#### Request:
+A GET request to ```http://localhost:8080/api/projects/1``` returns the project with an id of 1:
+
+#### Response:
+
+```json
+{
+    "id": 1,
+    "title": "projectA",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. A cras semper auctor neque vitae tempus quam pellentesque. Volutpat  consequat mauris nunc congue nisi vitae suscipit. Augue mauris augue neque gravida in. Tincidunt id aliquet risus feugiat in ante. Tellus at urna condimentum mattis pellentesque id nibh. Sed velit dignissim sodales ut eu sem integer. Ac tortor vitae purus faucibus ornare suspendisse sed. Aliquam vestibulum morbi blandit cursus risus. Pulvinar pellentesque habitant morbi tristique senectus. Etiam non quam lacus suspendisse faucibus interdum posuere. Tortor at auctor urna nunc id. Nisl rhoncus mattis rhoncus urna neque viverra justo nec ultrices.",
+    "private": false,
+    "owner": {
+        "id": 1,
+        "username": "user",
+        "email": "user@bugtracker.test",
+        "roles": [
+            "USER"
+        ]
+    },
+    "_links": {
+        "self": {
+            "href": "http://localhost:8080/api/projects/1"
+        },
+        "owner": {
+            "href": "http://localhost:8080/api/users/user"
+        },
+        "collaborators": {
+            "href": "http://localhost:8080/api/projects/1/collaborators"
+        },
+        "bugs": {
+            "href": "http://localhost:8080/api/projects/1/bugs"
+        }
+    }
+}
+```
