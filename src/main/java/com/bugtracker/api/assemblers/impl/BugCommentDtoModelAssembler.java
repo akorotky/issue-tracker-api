@@ -7,7 +7,6 @@ import com.bugtracker.api.controllers.BugCommentController;
 import com.bugtracker.api.controllers.BugController;
 import lombok.NonNull;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -24,7 +23,7 @@ public class BugCommentDtoModelAssembler implements ModelAssembler<BugCommentRes
 
         return EntityModel.of(bugCommentResponseDto,
                 linkTo(methodOn(BugCommentController.class).getBugComment(commentId)).withSelfRel(),
-                WebMvcLinkBuilder.linkTo(methodOn(UserController.class).getUser(username)).withRel("author"),
+                linkTo(methodOn(UserController.class).getUser(username)).withRel("author"),
                 linkTo(methodOn(BugController.class).getBug(bugId)).withRel("bug"));
     }
 }

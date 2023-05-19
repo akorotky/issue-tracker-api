@@ -7,7 +7,6 @@ import com.bugtracker.api.dto.projectdto.ProjectResponseDto;
 import lombok.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -23,7 +22,7 @@ public class ProjectDtoModelAssembler implements ModelAssembler<ProjectResponseD
 
         return EntityModel.of(projectResponseDto,
                 linkTo(methodOn(ProjectController.class).getProject(projectId)).withSelfRel(),
-                WebMvcLinkBuilder.linkTo(methodOn(UserController.class).getUser(username)).withRel("owner"),
+                linkTo(methodOn(UserController.class).getUser(username)).withRel("owner"),
                 linkTo(methodOn(ProjectController.class).getAllCollaborators(projectId)).withRel("collaborators"),
                 linkTo(methodOn(ProjectController.class).getAllBugs(projectId, Pageable.unpaged())).withRel("bugs"));
     }
