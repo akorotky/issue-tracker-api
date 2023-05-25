@@ -1,14 +1,15 @@
 package com.bugtracker.api.services;
 
-import com.bugtracker.api.dto.authdto.AuthenticationRequestDto;
-import com.bugtracker.api.dto.authdto.AuthenticationResponseDto;
-import com.bugtracker.api.dto.userdto.UserRequestDto;
-import com.bugtracker.api.dto.tokendto.AccessTokenRequestDto;
+import com.bugtracker.api.dto.auth.AuthenticationRequestDto;
+import com.bugtracker.api.dto.user.UserRequestDto;
+import com.bugtracker.api.dto.token.AccessTokenRequestDto;
 import org.springframework.security.core.Authentication;
+
+import java.util.Map;
 
 public interface AuthenticationService {
 
-    AuthenticationResponseDto authenticateUser(AuthenticationRequestDto authenticationRequestDto);
+    Map<String, String> authenticateUser(AuthenticationRequestDto authenticationRequestDto);
 
     Authentication getAuthenticationFromUsernamePassword(String username, String password);
 
