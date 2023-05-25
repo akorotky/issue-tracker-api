@@ -1,13 +1,17 @@
 package com.bugtracker.api.security.jwt;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -18,6 +22,7 @@ import java.io.IOException;
 public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtTokenService;
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -29,10 +34,13 @@ public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
 
         if (token != null) {
             try {
-                jwtTokenService.verifyToken(token, TokenType.ACCESS);
-                Authentication auth = jwtTokenService.getAuthentication(token, TokenType.ACCESS);
+                TokenType accessTokenType = TokenType.ACCESS;
+                jwtTokenService.verifyToken(token, accessTokenType);
+                String username = jwtTokenService.extractUsernameFromToken(token, accessTokenType);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(auth);
-            } catch (Exception e) {
+            } catch (JwtException e) {
                 SecurityContextHolder.clearContext();
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                 return;

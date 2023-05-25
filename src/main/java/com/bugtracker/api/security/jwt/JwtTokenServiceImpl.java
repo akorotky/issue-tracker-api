@@ -9,10 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -74,35 +71,16 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     @Override
-    public String generateAccessToken(String refreshToken) {
-        try {
-            verifyToken(refreshToken, TokenType.REFRESH);
-        } catch (JwtException e) {
-            return null;
-        }
-
-        Authentication authentication = getAuthentication(refreshToken, TokenType.REFRESH);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return generateAccessToken(userDetails);
-    }
-
-    @Override
-    public Authentication getAuthentication(String token, TokenType tokenType) {
-        Claims claims = extractClaimsFromToken(token, tokenType);
-        String username = claims.getSubject();
-
-        @SuppressWarnings("unchecked")
-        List<String> authorities = claims.get("authorities", ArrayList.class);
-        List<SimpleGrantedAuthority> grantedAuthorities = authorities.stream().map(SimpleGrantedAuthority::new).toList();
-        return new UsernamePasswordAuthenticationToken(username, null, grantedAuthorities);
-    }
-
-    @Override
     public Key getTokenPublicKey(TokenType tokenType) {
         return switch (tokenType) {
             case ACCESS -> accessTokenKeyPair.getPublic();
             case REFRESH -> refreshTokenKeyPair.getPublic();
         };
+    }
+
+    @Override
+    public String extractUsernameFromToken(String token, TokenType tokenType) {
+        return extractClaimsFromToken(token, tokenType).getSubject();
     }
 
     @Override
