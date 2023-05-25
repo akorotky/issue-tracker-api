@@ -1,6 +1,6 @@
-package com.bugtracker.api.dto.bugdto;
+package com.bugtracker.api.dto.bug;
 
-import com.bugtracker.api.dto.userdto.UserResponseDto;
+import com.bugtracker.api.dto.user.UserResponseDto;
 import org.springframework.hateoas.server.core.Relation;
 
 @Relation(collectionRelation = "bugs", itemRelation = "bug")

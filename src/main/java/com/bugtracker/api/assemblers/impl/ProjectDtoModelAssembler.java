@@ -3,7 +3,7 @@ package com.bugtracker.api.assemblers.impl;
 import com.bugtracker.api.controllers.UserController;
 import com.bugtracker.api.assemblers.ModelAssembler;
 import com.bugtracker.api.controllers.ProjectController;
-import com.bugtracker.api.dto.projectdto.ProjectResponseDto;
+import com.bugtracker.api.dto.project.ProjectResponseDto;
 import lombok.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;

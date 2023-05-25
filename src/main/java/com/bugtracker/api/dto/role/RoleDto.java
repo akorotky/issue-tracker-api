@@ -1,4 +1,4 @@
-package com.bugtracker.api.dto.roledto;
+package com.bugtracker.api.dto.role;
 
 import com.bugtracker.api.entities.role.RoleType;
 

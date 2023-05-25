@@ -1,4 +1,4 @@
-package com.bugtracker.api.dto.userdto;
+package com.bugtracker.api.dto.user;
 
 import org.springframework.hateoas.server.core.Relation;
 

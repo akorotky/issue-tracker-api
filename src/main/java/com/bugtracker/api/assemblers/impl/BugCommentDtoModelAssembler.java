@@ -2,7 +2,7 @@ package com.bugtracker.api.assemblers.impl;
 
 import com.bugtracker.api.assemblers.ModelAssembler;
 import com.bugtracker.api.controllers.UserController;
-import com.bugtracker.api.dto.bugcommentdto.BugCommentResponseDto;
+import com.bugtracker.api.dto.bugcomment.BugCommentResponseDto;
 import com.bugtracker.api.controllers.BugCommentController;
 import com.bugtracker.api.controllers.BugController;
 import lombok.NonNull;

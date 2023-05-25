@@ -1,4 +1,4 @@
-package com.bugtracker.api.dto.authdto;
+package com.bugtracker.api.dto.auth;
 
 public record AuthenticationRequestDto(
         String username,

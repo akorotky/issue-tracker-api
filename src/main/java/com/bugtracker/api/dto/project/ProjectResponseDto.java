@@ -1,6 +1,6 @@
-package com.bugtracker.api.dto.projectdto;
+package com.bugtracker.api.dto.project;
 
-import com.bugtracker.api.dto.userdto.UserResponseDto;
+import com.bugtracker.api.dto.user.UserResponseDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.springframework.hateoas.server.core.Relation;

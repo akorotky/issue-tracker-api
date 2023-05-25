@@ -1,4 +1,4 @@
-package com.bugtracker.api.dto.bugdto;
+package com.bugtracker.api.dto.bug;
 
 import jakarta.validation.constraints.NotBlank;
 

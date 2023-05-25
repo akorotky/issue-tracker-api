@@ -1,7 +1,7 @@
 package com.bugtracker.api.dbpopulator;
 
-import com.bugtracker.api.dto.projectdto.ProjectRequestDto;
-import com.bugtracker.api.dto.userdto.UserRequestDto;
+import com.bugtracker.api.dto.project.ProjectRequestDto;
+import com.bugtracker.api.dto.user.UserRequestDto;
 import com.bugtracker.api.entities.role.Role;
 import com.bugtracker.api.entities.role.RoleType;
 import com.bugtracker.api.repositories.RoleRepository;
