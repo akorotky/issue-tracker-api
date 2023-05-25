@@ -1,15 +1,18 @@
 package com.bugtracker.api.controllers;
 
 import com.bugtracker.api.assemblers.ModelAssembler;
-import com.bugtracker.api.dto.bugcommentdto.BugCommentDtoMapper;
-import com.bugtracker.api.dto.bugcommentdto.BugCommentResponseDto;
-import com.bugtracker.api.dto.bugdto.BugDtoMapper;
-import com.bugtracker.api.dto.bugdto.BugRequestDto;
-import com.bugtracker.api.dto.bugdto.BugResponseDto;
+import com.bugtracker.api.dto.bugcomment.BugCommentDtoMapper;
+import com.bugtracker.api.dto.bugcomment.BugCommentResponseDto;
+import com.bugtracker.api.dto.bug.BugDtoMapper;
+import com.bugtracker.api.dto.bug.BugRequestDto;
+import com.bugtracker.api.dto.bug.BugResponseDto;
+import com.bugtracker.api.entities.Bug;
+import com.bugtracker.api.entities.Project;
 import com.bugtracker.api.security.principal.CurrentUser;
 import com.bugtracker.api.services.BugCommentService;
 import com.bugtracker.api.services.BugService;
 import com.bugtracker.api.security.principal.UserPrincipal;
+import com.bugtracker.api.services.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,6 +30,7 @@ public class BugController {
 
     private final BugService bugService;
     private final BugCommentService bugCommentService;
+    private final ProjectService projectService;
     private final BugDtoMapper bugDtoMapper;
     private final BugCommentDtoMapper bugCommentDtoMapper;
     private final ModelAssembler<BugResponseDto> bugDtoModelAssembler;
@@ -48,19 +52,28 @@ public class BugController {
 
     @PostMapping
     public void createBug(@Valid @RequestBody BugRequestDto bugRequestDto, @CurrentUser UserPrincipal currentUser) {
-        bugService.createBug(bugRequestDto, currentUser.user());
+        Project project = projectService.findProjectById(bugRequestDto.projectId());
+        bugService.createBug(project, bugRequestDto, currentUser.user());
+    }
+
+    @PatchMapping("{bugId}")
+    public void updateBug(@PathVariable Long bugId, @Valid @RequestBody BugRequestDto bugRequestDto) {
+        Bug bug = bugService.findBugById(bugId);
+        bugService.updateBug(bug, bugRequestDto);
     }
 
     @DeleteMapping("{bugId}")
     public void deleteBug(@PathVariable Long bugId) {
-        bugService.deleteBugById(bugId);
+        Bug bug = bugService.findBugById(bugId);
+        bugService.deleteBug(bug);
     }
 
     @GetMapping("{bugId}/comments")
     public PagedModel<EntityModel<BugCommentResponseDto>> getComments(
             @PathVariable Long bugId,
             @PageableDefault(page = 0, size = 15) Pageable pageable) {
-        Page<BugCommentResponseDto> commentsPage = bugCommentService.findAllCommentsByBugId(bugId, pageable).map(bugCommentDtoMapper::toDto);
+        Bug bug = bugService.findBugById(bugId);
+        Page<BugCommentResponseDto> commentsPage = bugCommentService.findAllCommentsByBug(bug, pageable).map(bugCommentDtoMapper::toDto);
         return bugCommentDtoPagedResourcesAssembler.toModel(commentsPage, bugCommentDtoModelAssembler);
     }
 }

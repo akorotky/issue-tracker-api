@@ -1,22 +1,23 @@
 package com.bugtracker.api.services;
 
+import com.bugtracker.api.entities.Project;
 import com.bugtracker.api.entities.User;
-import com.bugtracker.api.dto.bugdto.BugRequestDto;
+import com.bugtracker.api.dto.bug.BugRequestDto;
 import com.bugtracker.api.entities.Bug;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface BugService {
 
-    Bug findBugById(Long id);
+    Bug findBugById(Long bugId);
 
     Page<Bug> findAllBugs(Pageable pageable);
 
-    Page<Bug> findAllBugsByProjectId(Long projectId, Pageable pageable);
+    Page<Bug> findAllBugsByProject(Project project, Pageable pageable);
 
-    void createBug(BugRequestDto bugRequestDto, User user);
+    void createBug(Project project, BugRequestDto bugRequestDto, User user);
 
-    void updateBug(BugRequestDto bugRequestDto);
+    void updateBug(Bug bug, BugRequestDto bugRequestDto);
 
-    void deleteBugById(Long id);
+    void deleteBug(Bug bug);
 }

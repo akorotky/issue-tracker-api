@@ -1,17 +1,23 @@
 package com.bugtracker.api.services.impl;
 
-import com.bugtracker.api.dto.bugcommentdto.BugCommentDtoMapper;
-import com.bugtracker.api.dto.bugcommentdto.BugCommentRequestDto;
+import com.bugtracker.api.dto.bugcomment.BugCommentDtoMapper;
+import com.bugtracker.api.dto.bugcomment.BugCommentRequestDto;
 import com.bugtracker.api.entities.BugComment;
 import com.bugtracker.api.entities.User;
 import com.bugtracker.api.exceptions.ResourceNotFoundException;
 import com.bugtracker.api.repositories.BugCommentRepository;
-import com.bugtracker.api.repositories.BugRepository;
+import com.bugtracker.api.security.acl.AclPermissionService;
+import com.bugtracker.api.security.expressions.permissions.bugcomment.BugCommentAuthorPermission;
+import com.bugtracker.api.security.expressions.permissions.bugcomment.BugCommentCreatePermission;
+import com.bugtracker.api.security.expressions.permissions.bugcomment.BugCommentReadPermission;
+import com.bugtracker.api.security.expressions.permissions.role.IsUser;
 import com.bugtracker.api.services.BugCommentService;
 import com.bugtracker.api.entities.Bug;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,44 +25,49 @@ import org.springframework.stereotype.Service;
 public class BugCommentServiceImpl implements BugCommentService {
 
     private final BugCommentRepository bugCommentRepository;
-    private final BugRepository bugRepository;
     private final BugCommentDtoMapper bugCommentDtoMapper;
+    private final AclPermissionService aclPermissionService;
+    private final Permission[] commentAuthorPermissions = {BasePermission.ADMINISTRATION};
 
+    @IsUser
     @Override
     public Page<BugComment> findAllBugComments(Pageable pageable) {
         return bugCommentRepository.findAll(pageable);
     }
 
+    @IsUser
+    @BugCommentReadPermission
     @Override
     public BugComment findBugCommentById(Long commentId) {
         return bugCommentRepository.findById(commentId).
                 orElseThrow(() -> new ResourceNotFoundException("Bug comment", "id", commentId));
     }
 
+    @BugCommentReadPermission
     @Override
-    public Page<BugComment> findAllCommentsByBugId(Long bugId, Pageable pageable) {
-        Bug bug = bugRepository.findById(bugId)
-                .orElseThrow(() -> new ResourceNotFoundException("Bug", "id", bugId));
+    public Page<BugComment> findAllCommentsByBug(Bug bug, Pageable pageable) {
         return bugCommentRepository.findByBug(bug, pageable);
     }
 
+    @BugCommentCreatePermission
     @Override
-    public void createBugComment(BugCommentRequestDto bugCommentRequestDto, User user) {
-        Bug bug = bugRepository.findById(bugCommentRequestDto.bugId()).
-                orElseThrow(() -> new ResourceNotFoundException("Bug", "id", bugCommentRequestDto.bugId()));
+    public void createBugComment(Bug bug, BugCommentRequestDto bugCommentRequestDto, User user) {
         BugComment bugComment = bugCommentDtoMapper.toEntity(bugCommentRequestDto);
         bugComment.setAuthor(user);
         bugComment.setBug(bug);
-        bugCommentRepository.save(bugComment);
+        bugCommentRepository.saveAndFlush(bugComment);
+        aclPermissionService.grantPermissions(bug, bug.getId(), user.getUsername(), commentAuthorPermissions);
     }
 
+    @BugCommentAuthorPermission
     @Override
-    public void updateBugComment(BugCommentRequestDto bugCommentRequestDto) {
+    public void updateBugComment(BugComment bugComment, BugCommentRequestDto bugCommentRequestDto) {
         bugCommentRepository.save(bugCommentDtoMapper.toEntity(bugCommentRequestDto));
     }
 
+    @BugCommentAuthorPermission
     @Override
-    public void deleteBugCommentById(Long commentId) {
-        bugCommentRepository.deleteById(commentId);
+    public void deleteBugComment(BugComment bugComment) {
+        bugCommentRepository.deleteById(bugComment.getId());
     }
 }

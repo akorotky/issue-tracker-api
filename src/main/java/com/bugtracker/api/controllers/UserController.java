@@ -1,9 +1,10 @@
 package com.bugtracker.api.controllers;
 
 import com.bugtracker.api.assemblers.ModelAssembler;
-import com.bugtracker.api.dto.userdto.UserDtoMapper;
-import com.bugtracker.api.dto.userdto.UserRequestDto;
-import com.bugtracker.api.dto.userdto.UserResponseDto;
+import com.bugtracker.api.dto.user.UserDtoMapper;
+import com.bugtracker.api.dto.user.UserRequestDto;
+import com.bugtracker.api.dto.user.UserResponseDto;
+import com.bugtracker.api.entities.User;
 import com.bugtracker.api.services.impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,6 @@ public class UserController {
                     @SortDefault(sort = "username", direction = Sort.Direction.DESC)
             }) Pageable pageable) {
         Page<UserResponseDto> usersPage = userService.findAllUsers(pageable).map(userDtoMapper::toDto);
-
         return userDtoPagedResourcesAssembler.toModel(usersPage, userDtoModelAssembler);
     }
 
@@ -49,8 +49,15 @@ public class UserController {
         return userDtoModelAssembler.toModel(user);
     }
 
+    @PatchMapping("{username}")
+    public void updateUser(@PathVariable String username, @Valid @RequestBody UserRequestDto userRequestDto) {
+        User user = userService.findUserByUsername(username);
+        userService.updateUser(user, userRequestDto);
+    }
+
     @DeleteMapping("{username}")
     public void deleteUser(@PathVariable String username) {
-        userService.deleteUserByUsername(username);
+        User user = userService.findUserByUsername(username);
+        userService.deleteUser(user);
     }
 }

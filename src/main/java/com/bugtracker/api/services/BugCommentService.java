@@ -1,6 +1,7 @@
 package com.bugtracker.api.services;
 
-import com.bugtracker.api.dto.bugcommentdto.BugCommentRequestDto;
+import com.bugtracker.api.dto.bugcomment.BugCommentRequestDto;
+import com.bugtracker.api.entities.Bug;
 import com.bugtracker.api.entities.User;
 import com.bugtracker.api.entities.BugComment;
 import org.springframework.data.domain.Page;
@@ -10,13 +11,13 @@ public interface BugCommentService {
 
     Page<BugComment> findAllBugComments(Pageable pageable);
 
-    BugComment findBugCommentById(Long id);
+    BugComment findBugCommentById(Long bugCommentId);
 
-    Page<BugComment> findAllCommentsByBugId(Long bugId, Pageable pageable);
+    Page<BugComment> findAllCommentsByBug(Bug bug, Pageable pageable);
 
-    void createBugComment(BugCommentRequestDto bugCommentRequestDto, User user);
+    void createBugComment(Bug bug, BugCommentRequestDto bugCommentRequestDto, User user);
 
-    void updateBugComment(BugCommentRequestDto bugCommentRequestDto);
+    void updateBugComment(BugComment bugComment, BugCommentRequestDto bugCommentRequestDto);
 
-    void deleteBugCommentById(Long id);
+    void deleteBugComment(BugComment bugComment);
 }
