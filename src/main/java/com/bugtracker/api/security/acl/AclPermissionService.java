@@ -4,5 +4,7 @@ import org.springframework.security.acls.model.Permission;
 
 public interface AclPermissionService {
 
-    void grantPermissions(Object object, Long objectId, String username, Permission permission);
+    void grantPermissions(Object object, Long objectId, String username, Permission... permissions);
+
+    void revokePermissions(Object object, Long objectId, String username, Permission... permissions);
 }

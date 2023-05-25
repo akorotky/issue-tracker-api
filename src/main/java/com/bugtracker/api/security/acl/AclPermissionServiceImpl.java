@@ -7,6 +7,9 @@ import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.*;
 import org.springframework.stereotype.Service;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class AclPermissionServiceImpl implements AclPermissionService {
@@ -15,7 +18,7 @@ public class AclPermissionServiceImpl implements AclPermissionService {
 
     @Transactional
     @Override
-    public void grantPermissions(Object object, Long objectId, String username, Permission permission) {
+    public void grantPermissions(Object object, Long objectId, String username, Permission... permissions) {
         ObjectIdentity objectIdentity = new ObjectIdentityImpl(object.getClass(), objectId);
         MutableAcl acl;
         try {
@@ -23,7 +26,30 @@ public class AclPermissionServiceImpl implements AclPermissionService {
         } catch (NotFoundException e) {
             acl = mutableAclService.createAcl(objectIdentity);
         }
-        acl.insertAce(acl.getEntries().size(), permission, new PrincipalSid(username), true);
+        for (Permission permission : permissions) {
+            acl.insertAce(acl.getEntries().size(), permission, new PrincipalSid(username), true);
+        }
+        mutableAclService.updateAcl(acl);
+    }
+
+    @Transactional
+    @Override
+    public void revokePermissions(Object object, Long objectId, String username, Permission... permissions) {
+        ObjectIdentity objectIdentity = new ObjectIdentityImpl(object.getClass(), objectId);
+        MutableAcl acl;
+        try {
+            acl = (MutableAcl) mutableAclService.readAclById(objectIdentity);
+        } catch (NotFoundException e) {
+            return;
+        }
+        Set<Permission> permissionSet = Arrays.stream(permissions).collect(Collectors.toSet());
+        List<AccessControlEntry> aceList = new ArrayList<>(acl.getEntries());
+        for (AccessControlEntry ace : aceList) {
+            PrincipalSid principalSid = (PrincipalSid) ace.getSid();
+            String principal = principalSid.getPrincipal();
+            if (principal.equals(username) && permissionSet.contains(ace.getPermission()))
+                acl.deleteAce((Integer) ace.getId());
+        }
         mutableAclService.updateAcl(acl);
     }
 }
