@@ -1,12 +1,10 @@
 package com.bugtracker.api.services.impl;
 
-import com.bugtracker.api.dto.user.UserRequestDto;
 import com.bugtracker.api.dto.auth.AuthenticationRequestDto;
 import com.bugtracker.api.dto.token.AccessTokenRequestDto;
 import com.bugtracker.api.security.jwt.TokenType;
 import com.bugtracker.api.services.AuthenticationService;
 import com.bugtracker.api.security.jwt.JwtTokenService;
-import com.bugtracker.api.services.UserService;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,7 +23,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final JwtTokenService jwtTokenService;
     private final AuthenticationManager authenticationManager;
-    private final UserService userService;
     private final UserDetailsService userDetailsService;
 
     @Override
@@ -47,11 +44,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
         );
-    }
-
-    @Override
-    public void registerUser(UserRequestDto userRequestDto) {
-        userService.createUser(userRequestDto);
     }
 
     @Override

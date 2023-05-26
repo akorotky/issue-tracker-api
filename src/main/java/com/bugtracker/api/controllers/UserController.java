@@ -16,7 +16,13 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.data.web.SortDefault;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("api/users")
@@ -39,8 +45,10 @@ public class UserController {
     }
 
     @PostMapping
-    public void createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
+    public ResponseEntity<?> createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
         userService.createUser(userRequestDto);
+        URI createdUserLocation = linkTo(methodOn(UserController.class).getUser(userRequestDto.username())).toUri();
+        return ResponseEntity.created(createdUserLocation).build();
     }
 
     @GetMapping("{username}")
