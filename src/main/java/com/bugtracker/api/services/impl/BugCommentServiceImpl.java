@@ -7,9 +7,10 @@ import com.bugtracker.api.entities.User;
 import com.bugtracker.api.exceptions.ResourceNotFoundException;
 import com.bugtracker.api.repositories.BugCommentRepository;
 import com.bugtracker.api.security.acl.AclPermissionService;
+import com.bugtracker.api.security.expressions.permissions.bug.BugReadPermission;
 import com.bugtracker.api.security.expressions.permissions.bugcomment.BugCommentAuthorPermission;
 import com.bugtracker.api.security.expressions.permissions.bugcomment.BugCommentCreatePermission;
-import com.bugtracker.api.security.expressions.permissions.bugcomment.BugCommentReadPermission;
+import com.bugtracker.api.security.expressions.permissions.bugcomment.BugCommentReadByIdPermission;
 import com.bugtracker.api.security.expressions.permissions.role.IsUser;
 import com.bugtracker.api.services.BugCommentService;
 import com.bugtracker.api.entities.Bug;
@@ -36,14 +37,14 @@ public class BugCommentServiceImpl implements BugCommentService {
     }
 
     @IsUser
-    @BugCommentReadPermission
+    @BugCommentReadByIdPermission
     @Override
     public BugComment findBugCommentById(Long commentId) {
         return bugCommentRepository.findById(commentId).
                 orElseThrow(() -> new ResourceNotFoundException("Bug comment", "id", commentId));
     }
 
-    @BugCommentReadPermission
+    @BugReadPermission
     @Override
     public Page<BugComment> findAllCommentsByBug(Bug bug, Pageable pageable) {
         return bugCommentRepository.findByBug(bug, pageable);

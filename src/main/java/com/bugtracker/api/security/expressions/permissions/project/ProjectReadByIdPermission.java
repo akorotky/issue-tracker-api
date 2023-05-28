@@ -1,6 +1,6 @@
 package com.bugtracker.api.security.expressions.permissions.project;
 
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PostAuthorize;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("!#project.isPrivate || hasPermission(#project, 'READ') || hasRole('ADMIN')")
-public @interface ProjectReadPermission {
+@PostAuthorize("!returnObject.isPrivate || hasPermission(#project, 'READ') || hasRole('ADMIN')")
+public @interface ProjectReadByIdPermission {
 }

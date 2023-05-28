@@ -7,6 +7,7 @@ import com.bugtracker.api.entities.User;
 import com.bugtracker.api.exceptions.ResourceNotFoundException;
 import com.bugtracker.api.security.acl.AclPermissionService;
 import com.bugtracker.api.security.expressions.permissions.project.ProjectAdminPermission;
+import com.bugtracker.api.security.expressions.permissions.project.ProjectReadByIdPermission;
 import com.bugtracker.api.security.expressions.permissions.project.ProjectReadPermission;
 import com.bugtracker.api.security.expressions.permissions.role.IsUser;
 import com.bugtracker.api.services.ProjectService;
@@ -49,7 +50,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @IsUser
-    @ProjectReadPermission
+    @ProjectReadByIdPermission
     @Override
     public Project findProjectById(Long projectId) {
         return projectRepository.findById(projectId)
@@ -79,7 +80,6 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.deleteById(project.getId());
     }
 
-    @IsUser
     @ProjectReadPermission
     @Override
     public List<User> getProjectCollaborators(Project project) {

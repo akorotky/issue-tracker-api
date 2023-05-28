@@ -9,7 +9,7 @@ import com.bugtracker.api.repositories.BugRepository;
 import com.bugtracker.api.security.acl.AclPermissionService;
 import com.bugtracker.api.security.expressions.permissions.bug.BugAuthorPermission;
 import com.bugtracker.api.security.expressions.permissions.bug.BugCreatePermission;
-import com.bugtracker.api.security.expressions.permissions.bug.BugReadPermission;
+import com.bugtracker.api.security.expressions.permissions.bug.BugReadByIdPermission;
 import com.bugtracker.api.security.expressions.permissions.project.ProjectReadPermission;
 import com.bugtracker.api.security.expressions.permissions.role.IsUser;
 import com.bugtracker.api.services.BugService;
@@ -43,7 +43,7 @@ public class BugServiceImpl implements BugService {
     }
 
     @IsUser
-    @BugReadPermission
+    @BugReadByIdPermission
     @Override
     public Bug findBugById(Long bugId) {
         return bugRepository.findById(bugId).
