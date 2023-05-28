@@ -30,9 +30,8 @@ public class WebSecurityConfig {
     private final JwtTokenAuthenticationFilter jwtTokenAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final String[] WHITELIST = {
-            /* DEV */
-            "/error", // Enable Error Tracing
-            /* PROD */
+            /* Error route */
+            "/api/error",
             /* Authentication routes */
             "/api/auth/**",
             /* Swagger/OpenAPI */
