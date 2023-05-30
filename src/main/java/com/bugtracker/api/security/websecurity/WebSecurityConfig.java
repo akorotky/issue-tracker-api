@@ -3,6 +3,7 @@ package com.bugtracker.api.security.websecurity;
 import com.bugtracker.api.security.jwt.JwtAuthenticationEntryPoint;
 import com.bugtracker.api.security.jwt.JwtTokenAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -39,6 +40,9 @@ public class WebSecurityConfig {
             "/swagger-ui/**"
     };
 
+    @Value("${security.jwt.enabled:true}")
+    private boolean jwtSecurityEnabled;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -49,10 +53,16 @@ public class WebSecurityConfig {
                         .requestMatchers(WHITELIST).permitAll().anyRequest().authenticated()
 
                 )
-                .authenticationProvider(daoAuthenticationProvider())
-                .addFilterBefore(jwtTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(entryPoint -> entryPoint.authenticationEntryPoint(jwtAuthenticationEntryPoint))
-        ;
+                .authenticationProvider(daoAuthenticationProvider());
+        // if JWT auth is disabled, security is defaulted to Basic auth
+        if (jwtSecurityEnabled) {
+            http
+                    .addFilterBefore(jwtTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                    .exceptionHandling(entryPoint -> entryPoint.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+            ;
+        } else {
+            http.httpBasic();
+        }
 
         return http.build();
     }
