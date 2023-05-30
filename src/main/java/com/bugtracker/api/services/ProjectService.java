@@ -18,7 +18,7 @@ public interface ProjectService {
 
     Page<Project> findAllProjectsByCollaborator(User user, Pageable pageable);
 
-    void createProject(ProjectRequestDto projectRequestDto, User user);
+    Project createProject(ProjectRequestDto projectRequestDto, User user);
 
     void updateProject(Project project, ProjectRequestDto projectRequestDto);
 

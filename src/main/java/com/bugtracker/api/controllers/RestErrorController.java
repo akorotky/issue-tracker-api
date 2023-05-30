@@ -16,16 +16,17 @@ import org.springframework.web.context.request.ServletWebRequest;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/error")
+@RequestMapping("api/error")
 @RequiredArgsConstructor
 public class RestErrorController implements ErrorController {
 
     private final ErrorAttributes errorAttributes;
+
     @Value("${debug.mode.enabled:false}")
     private boolean debuggingEnabled;
 
     @RequestMapping
-    public ResponseEntity<Object> error(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> error(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> requestErrorAttributes = getErrorAttributes(request, debuggingEnabled);
         HttpStatus status = HttpStatus.valueOf(response.getStatus());
         if (status == HttpStatus.NO_CONTENT) {

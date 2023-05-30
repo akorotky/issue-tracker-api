@@ -34,7 +34,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService, UserDetailsService {
 
-    private final String USER_NOT_FOUND_MSG = "User with %s %s not found";
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -43,28 +42,30 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format(USER_NOT_FOUND_MSG, "username", username)));
+                .orElseThrow(() -> new UsernameNotFoundException("User with username=" + username + " not found"));
         return new UserPrincipal(user);
     }
 
     @IsUser
     @Override
     public Page<User> findAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable);
+        Page<User> users = userRepository.findAll(pageable);
+        if (users.getTotalElements() == 0) throw new ResourceNotFoundException("No users found");
+        return users;
     }
 
     @IsUser
     @Override
     public User findUserByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+                .orElseThrow(() -> new ResourceNotFoundException("User with username=" + username + " not found"));
     }
 
     @IsUser
     @Override
     public User findUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User with id=" + userId + " not found"));
     }
 
     @IsAnonymousUser
@@ -76,7 +77,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findRoleByName(RoleType.USER)
-                .orElseThrow(() -> new ResourceNotFoundException("Role", "name", RoleType.USER)));
+                .orElseThrow(() -> new ResourceNotFoundException("Role with name=" + RoleType.USER + " not found")));
 
         user.setRoles(roles);
         user.setAccountEnabled(true);

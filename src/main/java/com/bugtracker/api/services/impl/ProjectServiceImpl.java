@@ -34,19 +34,27 @@ public class ProjectServiceImpl implements ProjectService {
     @IsUser
     @Override
     public Page<Project> findAllProjects(Pageable pageable) {
-        return projectRepository.findAll(pageable);
+        Page<Project> projects = projectRepository.findAll(pageable);
+        if (projects.getTotalElements() == 0) throw new ResourceNotFoundException("No projects found");
+        return projects;
     }
 
     @IsUser
     @Override
     public Page<Project> findAllProjectsByOwner(User user, Pageable pageable) {
-        return projectRepository.findByOwner(user, pageable);
+        Page<Project> projects = projectRepository.findByOwner(user, pageable);
+        if (projects.getTotalElements() == 0)
+            throw new ResourceNotFoundException("No projects with owner=" + user.getUsername() + " found");
+        return projects;
     }
 
     @IsUser
     @Override
     public Page<Project> findAllProjectsByCollaborator(User user, Pageable pageable) {
-        return projectRepository.findByCollaborator(user, pageable);
+        Page<Project> projects = projectRepository.findByCollaborator(user, pageable);
+        if (projects.getTotalElements() == 0)
+            throw new ResourceNotFoundException("No projects with collaborator=" + user.getUsername() + " found");
+        return projects;
     }
 
     @IsUser
@@ -54,16 +62,17 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project findProjectById(Long projectId) {
         return projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Project", "id", projectId));
+                .orElseThrow(() -> new ResourceNotFoundException("Project with id=" + projectId + " not found"));
     }
 
     @IsUser
     @Override
-    public void createProject(ProjectRequestDto projectRequestDto, User user) {
+    public Project createProject(ProjectRequestDto projectRequestDto, User user) {
         Project project = projectDtoMapper.toEntity(projectRequestDto);
         project.setOwner(user);
         projectRepository.saveAndFlush(project);
         aclPermissionService.grantPermissions(project, project.getId(), user.getUsername(), ownerPermissions);
+        return project;
     }
 
     @ProjectAdminPermission
@@ -83,7 +92,10 @@ public class ProjectServiceImpl implements ProjectService {
     @ProjectReadPermission
     @Override
     public List<User> getProjectCollaborators(Project project) {
-        return project.getCollaborators().stream().toList();
+        List<User> collaborators = project.getCollaborators().stream().toList();
+        if (collaborators.isEmpty())
+            throw new ResourceNotFoundException("No collaborators for project with id=" + project.getId() + " found");
+        return collaborators;
     }
 
     @ProjectAdminPermission

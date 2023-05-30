@@ -15,7 +15,7 @@ public interface BugService {
 
     Page<Bug> findAllBugsByProject(Project project, Pageable pageable);
 
-    void createBug(Project project, BugRequestDto bugRequestDto, User user);
+    Bug createBug(Project project, BugRequestDto bugRequestDto, User user);
 
     void updateBug(Bug bug, BugRequestDto bugRequestDto);
 

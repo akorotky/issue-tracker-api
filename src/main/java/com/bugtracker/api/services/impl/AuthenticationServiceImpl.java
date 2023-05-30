@@ -2,6 +2,7 @@ package com.bugtracker.api.services.impl;
 
 import com.bugtracker.api.dto.auth.AuthenticationRequestDto;
 import com.bugtracker.api.dto.token.AccessTokenRequestDto;
+import com.bugtracker.api.exceptions.JwtTokenException;
 import com.bugtracker.api.security.jwt.TokenType;
 import com.bugtracker.api.services.AuthenticationService;
 import com.bugtracker.api.security.jwt.JwtTokenService;
@@ -47,8 +48,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public String refreshAccessToken(AccessTokenRequestDto accessTokenRequestDto) throws JwtException {
-        jwtTokenService.verifyToken(accessTokenRequestDto.refreshToken(), TokenType.REFRESH);
+    public String refreshAccessToken(AccessTokenRequestDto accessTokenRequestDto) {
+        try {
+            jwtTokenService.verifyToken(accessTokenRequestDto.refreshToken(), TokenType.REFRESH);
+        } catch (JwtException e) {
+            throw new JwtTokenException("Refresh token is expired or invalid");
+        }
         String username = jwtTokenService.extractUsernameFromToken(accessTokenRequestDto.refreshToken(), TokenType.REFRESH);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         return jwtTokenService.generateAccessToken(userDetails);

@@ -23,8 +23,11 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -48,7 +51,7 @@ public class ProjectController {
     private final PagedResourcesAssembler<BugResponseDto> bugDtoPagedResourcesAssembler;
 
     @GetMapping
-    public PagedModel<EntityModel<ProjectResponseDto>> getProjectsPage(
+    public ResponseEntity<PagedModel<EntityModel<ProjectResponseDto>>> getProjectsPage(
             @RequestParam(required = false) String owner,
             @RequestParam(required = false) String collaborator,
             @PageableDefault(page = 0, size = 20) Pageable pageable) {
@@ -64,64 +67,76 @@ public class ProjectController {
             user = userService.findUserByUsername(collaborator);
             projectsPage = projectService.findAllProjectsByCollaborator(user, pageable);
         }
-
-        return projectDtoPagedResourcesAssembler.toModel(projectsPage.map(projectDtoMapper::toDto), projectDtoModelAssembler);
+        Page<ProjectResponseDto> projectDtosPage = projectsPage.map(projectDtoMapper::toDto);
+        PagedModel<EntityModel<ProjectResponseDto>> projectDtosPagedModel = projectDtoPagedResourcesAssembler.toModel(projectDtosPage, projectDtoModelAssembler);
+        return ResponseEntity.ok(projectDtosPagedModel);
     }
 
     @GetMapping("{projectId}")
-    public EntityModel<ProjectResponseDto> getProject(@PathVariable Long projectId) {
-        ProjectResponseDto project = projectDtoMapper.toDto(projectService.findProjectById(projectId));
-        return projectDtoModelAssembler.toModel(project);
-    }
-
-    @PatchMapping("{projectId}")
-    public void updateProject(@RequestBody ProjectRequestDto projectRequestDto, @PathVariable Long projectId) {
+    public ResponseEntity<EntityModel<ProjectResponseDto>> getProject(@PathVariable Long projectId) {
         Project project = projectService.findProjectById(projectId);
-        projectService.updateProject(project, projectRequestDto);
-    }
-
-    @DeleteMapping("{projectId}")
-    public void deleteProject(@PathVariable Long projectId) {
-        Project project = projectService.findProjectById(projectId);
-        projectService.deleteProject(project);
+        ProjectResponseDto projectDto = projectDtoMapper.toDto(project);
+        EntityModel<ProjectResponseDto> projectDtoModel = projectDtoModelAssembler.toModel(projectDto);
+        return ResponseEntity.ok(projectDtoModel);
     }
 
     @PostMapping
-    public void createProject(@RequestBody ProjectRequestDto project, @CurrentUser UserPrincipal currentUser) {
-        projectService.createProject(project, currentUser.user());
+    public ResponseEntity<?> createProject(@RequestBody ProjectRequestDto projectRequestDto, @CurrentUser UserPrincipal currentUser) {
+        Project project = projectService.createProject(projectRequestDto, currentUser.user());
+        URI createdProjectUri = linkTo(methodOn(ProjectController.class).getProject(project.getId())).toUri();
+        return ResponseEntity.created(createdProjectUri).build();
+    }
+
+    @PatchMapping("{projectId}")
+    public ResponseEntity<?> updateProject(@RequestBody ProjectRequestDto projectRequestDto, @PathVariable Long projectId) {
+        Project project = projectService.findProjectById(projectId);
+        projectService.updateProject(project, projectRequestDto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("{projectId}")
+    public ResponseEntity<?> deleteProject(@PathVariable Long projectId) {
+        Project project = projectService.findProjectById(projectId);
+        projectService.deleteProject(project);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("{projectId}/collaborators")
-    public CollectionModel<EntityModel<UserResponseDto>> getAllCollaborators(@PathVariable Long projectId) {
+    public ResponseEntity<CollectionModel<EntityModel<UserResponseDto>>> getAllCollaborators(@PathVariable Long projectId) {
         Project project = projectService.findProjectById(projectId);
-        List<EntityModel<UserResponseDto>> collaborators = projectService.getProjectCollaborators(project).stream()
+        List<EntityModel<UserResponseDto>> collaboratorDtoList = projectService.getProjectCollaborators(project).stream()
                 .map(userDtoMapper::toDto)
                 .map(userDtoModelAssembler::toModel)
                 .toList();
 
-        return CollectionModel.of(collaborators, linkTo(methodOn(ProjectController.class).getAllCollaborators(projectId)).withSelfRel());
+        CollectionModel<EntityModel<UserResponseDto>> collaboratorDtoListModel = CollectionModel.of(collaboratorDtoList);
+        collaboratorDtoListModel.add(linkTo(methodOn(ProjectController.class).getAllCollaborators(projectId)).withSelfRel());
+        return ResponseEntity.ok(collaboratorDtoListModel);
     }
 
     @PutMapping("{projectId}/collaborators/{username}")
-    public void addCollaborator(@PathVariable Long projectId, @PathVariable String username) {
+    public ResponseEntity<?> addCollaborator(@PathVariable Long projectId, @PathVariable String username) {
         Project project = projectService.findProjectById(projectId);
         User collaborator = userService.findUserByUsername(username);
         projectService.addProjectCollaborator(project, collaborator);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("{projectId}/collaborators/{username}")
-    public void removeCollaborator(@PathVariable Long projectId, @PathVariable String username) {
+    public ResponseEntity<?> removeCollaborator(@PathVariable Long projectId, @PathVariable String username) {
         Project project = projectService.findProjectById(projectId);
         User collaborator = userService.findUserByUsername(username);
         projectService.removeProjectCollaborator(project, collaborator);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("{projectId}/bugs")
-    public CollectionModel<EntityModel<BugResponseDto>> getAllBugs(
+    public ResponseEntity<PagedModel<EntityModel<BugResponseDto>>> getAllBugs(
             @PathVariable Long projectId,
             @PageableDefault(page = 0, size = 15) Pageable pageable) {
         Project project = projectService.findProjectById(projectId);
-        Page<BugResponseDto> bugsPage = bugService.findAllBugsByProject(project, pageable).map(bugDtoMapper::toDto);
-        return bugDtoPagedResourcesAssembler.toModel(bugsPage, bugDtoModelAssembler);
+        Page<BugResponseDto> bugDtosPage = bugService.findAllBugsByProject(project, pageable).map(bugDtoMapper::toDto);
+        PagedModel<EntityModel<BugResponseDto>> bugDtosPagedModel = bugDtoPagedResourcesAssembler.toModel(bugDtosPage, bugDtoModelAssembler);
+        return ResponseEntity.ok(bugDtosPagedModel);
     }
 }

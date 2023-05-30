@@ -33,13 +33,18 @@ public class BugServiceImpl implements BugService {
     @IsUser
     @Override
     public Page<Bug> findAllBugs(Pageable pageable) {
-        return bugRepository.findAll(pageable);
+        Page<Bug> bugs = bugRepository.findAll(pageable);
+        if (bugs.getTotalElements() == 0) throw new ResourceNotFoundException("No bugs found");
+        return bugs;
     }
 
     @ProjectReadPermission
     @Override
     public Page<Bug> findAllBugsByProject(Project project, Pageable pageable) {
-        return bugRepository.findByProject(project, pageable);
+        Page<Bug> bugs = bugRepository.findByProject(project, pageable);
+        if (bugs.getTotalElements() == 0)
+            throw new ResourceNotFoundException("No bugs for project with id=" + project.getId() + " found");
+        return bugs;
     }
 
     @IsUser
@@ -47,18 +52,18 @@ public class BugServiceImpl implements BugService {
     @Override
     public Bug findBugById(Long bugId) {
         return bugRepository.findById(bugId).
-                orElseThrow(() -> new ResourceNotFoundException("Bug", "id", bugId));
+                orElseThrow(() -> new ResourceNotFoundException("Bug with id=" + bugId + " not found"));
     }
 
     @BugCreatePermission
     @Override
-    public void createBug(Project project, BugRequestDto bugRequestDto, User user) {
+    public Bug createBug(Project project, BugRequestDto bugRequestDto, User user) {
         Bug bug = bugDtoMapper.toEntity(bugRequestDto);
         bug.setProject(project);
         bug.setAuthor(user);
         bugRepository.saveAndFlush(bug);
         aclPermissionService.grantPermissions(bug, bug.getId(), user.getUsername(), bugAuthorPermissions);
-
+        return bug;
     }
 
     @BugAuthorPermission

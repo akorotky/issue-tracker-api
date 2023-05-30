@@ -15,7 +15,7 @@ public interface BugCommentService {
 
     Page<BugComment> findAllCommentsByBug(Bug bug, Pageable pageable);
 
-    void createBugComment(Bug bug, BugCommentRequestDto bugCommentRequestDto, User user);
+    BugComment createBugComment(Bug bug, BugCommentRequestDto bugCommentRequestDto, User user);
 
     void updateBugComment(BugComment bugComment, BugCommentRequestDto bugCommentRequestDto);
 

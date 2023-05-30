@@ -99,7 +99,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     @Override
-    public void verifyToken(String token, TokenType tokenType) throws JwtException {
+    public void verifyToken(String token, TokenType tokenType) {
         try {
             Jwts.parserBuilder().setSigningKey(getTokenPublicKey(tokenType)).build().parseClaimsJws(token);
         } catch (JwtException e) {

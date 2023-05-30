@@ -18,8 +18,14 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("api/comments")
@@ -33,35 +39,40 @@ public class BugCommentController {
     private final BugCommentDtoMapper bugCommentDtoMapper;
 
     @GetMapping
-    public PagedModel<EntityModel<BugCommentResponseDto>> getBugCommentsPage(@PageableDefault(page = 0, size = 15) Pageable pageable) {
-        Page<BugCommentResponseDto> commentsPage = bugCommentService.findAllBugComments(pageable).map(bugCommentDtoMapper::toDto);
-        return bugCommentDtoPagedResourcesAssembler.toModel(commentsPage, bugCommentDtoModelAssembler);
+    public ResponseEntity<PagedModel<EntityModel<BugCommentResponseDto>>> getBugCommentsPage(@PageableDefault(page = 0, size = 15) Pageable pageable) {
+        Page<BugCommentResponseDto> commentDtosPage = bugCommentService.findAllBugComments(pageable).map(bugCommentDtoMapper::toDto);
+        PagedModel<EntityModel<BugCommentResponseDto>> commentDtosPagedModel = bugCommentDtoPagedResourcesAssembler.toModel(commentDtosPage, bugCommentDtoModelAssembler);
+        return ResponseEntity.ok(commentDtosPagedModel);
     }
 
     @GetMapping("{commentId}")
-    public EntityModel<BugCommentResponseDto> getBugComment(@PathVariable Long commentId) {
+    public ResponseEntity<EntityModel<BugCommentResponseDto>> getBugComment(@PathVariable Long commentId) {
         BugCommentResponseDto bugCommentDto = bugCommentDtoMapper.toDto(bugCommentService.findBugCommentById(commentId));
-        return bugCommentDtoModelAssembler.toModel(bugCommentDto);
+        EntityModel<BugCommentResponseDto> bugCommentDtoModel = bugCommentDtoModelAssembler.toModel(bugCommentDto);
+        return ResponseEntity.ok(bugCommentDtoModel);
     }
 
     @PostMapping
-    public void createBugComment(
+    public ResponseEntity<?> createBugComment(
             @Valid @RequestBody BugCommentRequestDto bugCommentRequestDto,
             @CurrentUser UserPrincipal currentUser) {
         Bug bug = bugService.findBugById(bugCommentRequestDto.bugId());
-        bugCommentService.createBugComment(bug, bugCommentRequestDto, currentUser.user());
+        BugComment bugComment = bugCommentService.createBugComment(bug, bugCommentRequestDto, currentUser.user());
+        URI createdBugCommentUri = linkTo(methodOn(BugCommentController.class).getBugComment(bugComment.getId())).toUri();
+        return ResponseEntity.created(createdBugCommentUri).build();
     }
 
     @PatchMapping("{commentId}")
-    public void updateBugComment(@PathVariable Long bugId, @Valid @RequestBody BugCommentRequestDto bugCommentRequestDto) {
+    public ResponseEntity<?> updateBugComment(@PathVariable Long bugId, @Valid @RequestBody BugCommentRequestDto bugCommentRequestDto) {
         BugComment bugComment = bugCommentService.findBugCommentById(bugId);
         bugCommentService.updateBugComment(bugComment, bugCommentRequestDto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PreAuthorize("hasPermission(#commentId, 'com.bugtracker.api.entities.BugComment', 'ADMINISTRATION'")
     @DeleteMapping("{commentId}")
-    public void deleteBugComment(@PathVariable Long commentId) {
+    public ResponseEntity<?> deleteBugComment(@PathVariable Long commentId) {
         BugComment bugComment = bugCommentService.findBugCommentById(commentId);
         bugCommentService.deleteBugComment(bugComment);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

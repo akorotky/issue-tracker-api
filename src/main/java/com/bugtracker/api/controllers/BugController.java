@@ -21,7 +21,14 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("api/bugs")
@@ -39,41 +46,48 @@ public class BugController {
     private final PagedResourcesAssembler<BugCommentResponseDto> bugCommentDtoPagedResourcesAssembler;
 
     @GetMapping
-    public PagedModel<EntityModel<BugResponseDto>> getBugsPage(@PageableDefault(page = 0, size = 15) Pageable pageable) {
-        Page<BugResponseDto> bugsPage = bugService.findAllBugs(pageable).map(bugDtoMapper::toDto);
-        return bugDtoPagedResourcesAssembler.toModel(bugsPage, bugDtoModelAssembler);
+    public ResponseEntity<PagedModel<EntityModel<BugResponseDto>>> getBugsPage(@PageableDefault(page = 0, size = 15) Pageable pageable) {
+        Page<BugResponseDto> bugDtosPage = bugService.findAllBugs(pageable).map(bugDtoMapper::toDto);
+        PagedModel<EntityModel<BugResponseDto>> bugDtosPagedModel = bugDtoPagedResourcesAssembler.toModel(bugDtosPage, bugDtoModelAssembler);
+        return ResponseEntity.ok(bugDtosPagedModel);
     }
 
     @GetMapping("{bugId}")
-    public EntityModel<BugResponseDto> getBug(@PathVariable Long bugId) {
+    public ResponseEntity<EntityModel<BugResponseDto>> getBug(@PathVariable Long bugId) {
         BugResponseDto bug = bugDtoMapper.toDto(bugService.findBugById(bugId));
-        return bugDtoModelAssembler.toModel(bug);
+        EntityModel<BugResponseDto> bugDtoModel = bugDtoModelAssembler.toModel(bug);
+        return ResponseEntity.ok(bugDtoModel);
     }
 
     @PostMapping
-    public void createBug(@Valid @RequestBody BugRequestDto bugRequestDto, @CurrentUser UserPrincipal currentUser) {
+    public ResponseEntity<?> createBug(@Valid @RequestBody BugRequestDto bugRequestDto, @CurrentUser UserPrincipal currentUser) {
         Project project = projectService.findProjectById(bugRequestDto.projectId());
-        bugService.createBug(project, bugRequestDto, currentUser.user());
+        Bug bug = bugService.createBug(project, bugRequestDto, currentUser.user());
+        URI createdBugUri = linkTo(methodOn(BugController.class).getBug(bug.getId())).toUri();
+        return ResponseEntity.created(createdBugUri).build();
     }
 
     @PatchMapping("{bugId}")
-    public void updateBug(@PathVariable Long bugId, @Valid @RequestBody BugRequestDto bugRequestDto) {
+    public ResponseEntity<?> updateBug(@PathVariable Long bugId, @Valid @RequestBody BugRequestDto bugRequestDto) {
         Bug bug = bugService.findBugById(bugId);
         bugService.updateBug(bug, bugRequestDto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("{bugId}")
-    public void deleteBug(@PathVariable Long bugId) {
+    public ResponseEntity<?> deleteBug(@PathVariable Long bugId) {
         Bug bug = bugService.findBugById(bugId);
         bugService.deleteBug(bug);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("{bugId}/comments")
-    public PagedModel<EntityModel<BugCommentResponseDto>> getComments(
+    public ResponseEntity<PagedModel<EntityModel<BugCommentResponseDto>>> getComments(
             @PathVariable Long bugId,
             @PageableDefault(page = 0, size = 15) Pageable pageable) {
         Bug bug = bugService.findBugById(bugId);
-        Page<BugCommentResponseDto> commentsPage = bugCommentService.findAllCommentsByBug(bug, pageable).map(bugCommentDtoMapper::toDto);
-        return bugCommentDtoPagedResourcesAssembler.toModel(commentsPage, bugCommentDtoModelAssembler);
+        Page<BugCommentResponseDto> commentDtosPage = bugCommentService.findAllCommentsByBug(bug, pageable).map(bugCommentDtoMapper::toDto);
+        PagedModel<EntityModel<BugCommentResponseDto>> commentDtosPagedModel = bugCommentDtoPagedResourcesAssembler.toModel(commentDtosPage, bugCommentDtoModelAssembler);
+        return ResponseEntity.ok(commentDtosPagedModel);
     }
 }

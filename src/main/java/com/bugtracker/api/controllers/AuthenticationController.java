@@ -6,7 +6,6 @@ import com.bugtracker.api.dto.token.AccessTokenRequestDto;
 import com.bugtracker.api.dto.token.AccessTokenResponseDto;
 import com.bugtracker.api.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +29,6 @@ public class AuthenticationController {
     @PostMapping("/token")
     public ResponseEntity<?> refreshAccessToken(@RequestBody AccessTokenRequestDto accessTokenRequestDto) {
         String accessToken = authenticationService.refreshAccessToken(accessTokenRequestDto);
-        if (accessToken == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Refresh token is invalid.");
         return ResponseEntity.ok(new AccessTokenResponseDto(accessToken));
     }
 }

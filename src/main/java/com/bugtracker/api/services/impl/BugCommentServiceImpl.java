@@ -33,7 +33,9 @@ public class BugCommentServiceImpl implements BugCommentService {
     @IsUser
     @Override
     public Page<BugComment> findAllBugComments(Pageable pageable) {
-        return bugCommentRepository.findAll(pageable);
+        Page<BugComment> bugComments = bugCommentRepository.findAll(pageable);
+        if (bugComments.getTotalElements() == 0) throw new ResourceNotFoundException("No bug comments found");
+        return bugComments;
     }
 
     @IsUser
@@ -41,23 +43,27 @@ public class BugCommentServiceImpl implements BugCommentService {
     @Override
     public BugComment findBugCommentById(Long commentId) {
         return bugCommentRepository.findById(commentId).
-                orElseThrow(() -> new ResourceNotFoundException("Bug comment", "id", commentId));
+                orElseThrow(() -> new ResourceNotFoundException("Bug comment with id=" + commentId + " not found"));
     }
 
     @BugReadPermission
     @Override
     public Page<BugComment> findAllCommentsByBug(Bug bug, Pageable pageable) {
-        return bugCommentRepository.findByBug(bug, pageable);
+        Page<BugComment> bugComments = bugCommentRepository.findByBug(bug, pageable);
+        if (bugComments.getTotalElements() == 0)
+            throw new ResourceNotFoundException("No comments for bug with id=" + bug.getId() + " found");
+        return bugComments;
     }
 
     @BugCommentCreatePermission
     @Override
-    public void createBugComment(Bug bug, BugCommentRequestDto bugCommentRequestDto, User user) {
+    public BugComment createBugComment(Bug bug, BugCommentRequestDto bugCommentRequestDto, User user) {
         BugComment bugComment = bugCommentDtoMapper.toEntity(bugCommentRequestDto);
         bugComment.setAuthor(user);
         bugComment.setBug(bug);
         bugCommentRepository.saveAndFlush(bugComment);
         aclPermissionService.grantPermissions(bug, bug.getId(), user.getUsername(), commentAuthorPermissions);
+        return bugComment;
     }
 
     @BugCommentAuthorPermission

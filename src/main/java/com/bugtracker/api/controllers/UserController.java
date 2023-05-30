@@ -16,6 +16,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.data.web.SortDefault;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,37 +36,42 @@ public class UserController {
     private final UserDtoMapper userDtoMapper;
 
     @GetMapping
-    public PagedModel<EntityModel<UserResponseDto>> getUsersPage(
+    public ResponseEntity<PagedModel<EntityModel<UserResponseDto>>> getUsersPage(
             @PageableDefault(page = 0, size = 15)
             @SortDefault.SortDefaults({
                     @SortDefault(sort = "username", direction = Sort.Direction.DESC)
             }) Pageable pageable) {
-        Page<UserResponseDto> usersPage = userService.findAllUsers(pageable).map(userDtoMapper::toDto);
-        return userDtoPagedResourcesAssembler.toModel(usersPage, userDtoModelAssembler);
+        Page<UserResponseDto> userDtosPage = userService.findAllUsers(pageable).map(userDtoMapper::toDto);
+        PagedModel<EntityModel<UserResponseDto>> userDtosPagedModel = userDtoPagedResourcesAssembler.toModel(userDtosPage, userDtoModelAssembler);
+        return ResponseEntity.ok(userDtosPagedModel);
     }
 
     @PostMapping
     public ResponseEntity<?> createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
         userService.createUser(userRequestDto);
-        URI createdUserLocation = linkTo(methodOn(UserController.class).getUser(userRequestDto.username())).toUri();
-        return ResponseEntity.created(createdUserLocation).build();
+        URI createdUserUri = linkTo(methodOn(UserController.class).getUser(userRequestDto.username())).toUri();
+        return ResponseEntity.created(createdUserUri).build();
     }
 
     @GetMapping("{username}")
-    public EntityModel<UserResponseDto> getUser(@PathVariable String username) {
-        UserResponseDto user = userDtoMapper.toDto(userService.findUserByUsername(username));
-        return userDtoModelAssembler.toModel(user);
+    public ResponseEntity<EntityModel<UserResponseDto>> getUser(@PathVariable String username) {
+        User user = userService.findUserByUsername(username);
+        UserResponseDto userDto = userDtoMapper.toDto(user);
+        EntityModel<UserResponseDto> userDtoModel = userDtoModelAssembler.toModel(userDto);
+        return ResponseEntity.ok(userDtoModel);
     }
 
     @PatchMapping("{username}")
-    public void updateUser(@PathVariable String username, @Valid @RequestBody UserRequestDto userRequestDto) {
+    public ResponseEntity<?> updateUser(@PathVariable String username, @Valid @RequestBody UserRequestDto userRequestDto) {
         User user = userService.findUserByUsername(username);
         userService.updateUser(user, userRequestDto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("{username}")
-    public void deleteUser(@PathVariable String username) {
+    public ResponseEntity<?> deleteUser(@PathVariable String username) {
         User user = userService.findUserByUsername(username);
         userService.deleteUser(user);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
