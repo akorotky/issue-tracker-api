@@ -15,8 +15,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.data.web.SortDefault;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +37,7 @@ public class UserController {
     private final PagedResourcesAssembler<UserResponseDto> userDtoPagedResourcesAssembler;
     private final UserDtoMapper userDtoMapper;
 
-    @GetMapping
+    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<PagedModel<EntityModel<UserResponseDto>>> getUsersPage(
             @PageableDefault(page = 0, size = 15)
             @SortDefault.SortDefaults({
@@ -46,14 +48,14 @@ public class UserController {
         return ResponseEntity.ok(userDtosPagedModel);
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
         userService.createUser(userRequestDto);
         URI createdUserUri = linkTo(methodOn(UserController.class).getUser(userRequestDto.username())).toUri();
         return ResponseEntity.created(createdUserUri).build();
     }
 
-    @GetMapping("{username}")
+    @GetMapping(path = "{username}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<UserResponseDto>> getUser(@PathVariable String username) {
         User user = userService.findUserByUsername(username);
         UserResponseDto userDto = userDtoMapper.toDto(user);
@@ -61,7 +63,7 @@ public class UserController {
         return ResponseEntity.ok(userDtoModel);
     }
 
-    @PatchMapping("{username}")
+    @PatchMapping(path = "{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateUser(@PathVariable String username, @Valid @RequestBody UserRequestDto userRequestDto) {
         User user = userService.findUserByUsername(username);
         userService.updateUser(user, userRequestDto);

@@ -8,6 +8,7 @@ import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ public class RestErrorController implements ErrorController {
     @Value("${debug.mode.enabled:false}")
     private boolean debuggingEnabled;
 
-    @RequestMapping
+    @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> error(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> requestErrorAttributes = getErrorAttributes(request, debuggingEnabled);
         HttpStatus status = HttpStatus.valueOf(response.getStatus());

@@ -17,8 +17,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,21 +40,21 @@ public class BugCommentController {
     private final PagedResourcesAssembler<BugCommentResponseDto> bugCommentDtoPagedResourcesAssembler;
     private final BugCommentDtoMapper bugCommentDtoMapper;
 
-    @GetMapping
+    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<PagedModel<EntityModel<BugCommentResponseDto>>> getBugCommentsPage(@PageableDefault(page = 0, size = 15) Pageable pageable) {
         Page<BugCommentResponseDto> commentDtosPage = bugCommentService.findAllBugComments(pageable).map(bugCommentDtoMapper::toDto);
         PagedModel<EntityModel<BugCommentResponseDto>> commentDtosPagedModel = bugCommentDtoPagedResourcesAssembler.toModel(commentDtosPage, bugCommentDtoModelAssembler);
         return ResponseEntity.ok(commentDtosPagedModel);
     }
 
-    @GetMapping("{commentId}")
+    @GetMapping(path = "{commentId}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<BugCommentResponseDto>> getBugComment(@PathVariable Long commentId) {
         BugCommentResponseDto bugCommentDto = bugCommentDtoMapper.toDto(bugCommentService.findBugCommentById(commentId));
         EntityModel<BugCommentResponseDto> bugCommentDtoModel = bugCommentDtoModelAssembler.toModel(bugCommentDto);
         return ResponseEntity.ok(bugCommentDtoModel);
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createBugComment(
             @Valid @RequestBody BugCommentRequestDto bugCommentRequestDto,
             @CurrentUser UserPrincipal currentUser) {
@@ -62,7 +64,7 @@ public class BugCommentController {
         return ResponseEntity.created(createdBugCommentUri).build();
     }
 
-    @PatchMapping("{commentId}")
+    @PatchMapping(path = "{commentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateBugComment(@PathVariable Long bugId, @Valid @RequestBody BugCommentRequestDto bugCommentRequestDto) {
         BugComment bugComment = bugCommentService.findBugCommentById(bugId);
         bugCommentService.updateBugComment(bugComment, bugCommentRequestDto);

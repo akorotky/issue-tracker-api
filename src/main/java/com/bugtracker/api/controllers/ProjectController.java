@@ -22,8 +22,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,7 +52,7 @@ public class ProjectController {
     private final PagedResourcesAssembler<ProjectResponseDto> projectDtoPagedResourcesAssembler;
     private final PagedResourcesAssembler<BugResponseDto> bugDtoPagedResourcesAssembler;
 
-    @GetMapping
+    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<PagedModel<EntityModel<ProjectResponseDto>>> getProjectsPage(
             @RequestParam(required = false) String owner,
             @RequestParam(required = false) String collaborator,
@@ -72,7 +74,7 @@ public class ProjectController {
         return ResponseEntity.ok(projectDtosPagedModel);
     }
 
-    @GetMapping("{projectId}")
+    @GetMapping(path = "{projectId}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<ProjectResponseDto>> getProject(@PathVariable Long projectId) {
         Project project = projectService.findProjectById(projectId);
         ProjectResponseDto projectDto = projectDtoMapper.toDto(project);
@@ -80,14 +82,14 @@ public class ProjectController {
         return ResponseEntity.ok(projectDtoModel);
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createProject(@RequestBody ProjectRequestDto projectRequestDto, @CurrentUser UserPrincipal currentUser) {
         Project project = projectService.createProject(projectRequestDto, currentUser.user());
         URI createdProjectUri = linkTo(methodOn(ProjectController.class).getProject(project.getId())).toUri();
         return ResponseEntity.created(createdProjectUri).build();
     }
 
-    @PatchMapping("{projectId}")
+    @PatchMapping(path = "{projectId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateProject(@RequestBody ProjectRequestDto projectRequestDto, @PathVariable Long projectId) {
         Project project = projectService.findProjectById(projectId);
         projectService.updateProject(project, projectRequestDto);
@@ -101,7 +103,7 @@ public class ProjectController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("{projectId}/collaborators")
+    @GetMapping(path = "{projectId}/collaborators", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<CollectionModel<EntityModel<UserResponseDto>>> getAllCollaborators(@PathVariable Long projectId) {
         Project project = projectService.findProjectById(projectId);
         List<EntityModel<UserResponseDto>> collaboratorDtoList = projectService.getProjectCollaborators(project).stream()
@@ -130,7 +132,7 @@ public class ProjectController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("{projectId}/bugs")
+    @GetMapping(path = "{projectId}/bugs", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<PagedModel<EntityModel<BugResponseDto>>> getAllBugs(
             @PathVariable Long projectId,
             @PageableDefault(page = 0, size = 15) Pageable pageable) {

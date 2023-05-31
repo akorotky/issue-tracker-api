@@ -20,8 +20,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,21 +47,21 @@ public class BugController {
     private final PagedResourcesAssembler<BugResponseDto> bugDtoPagedResourcesAssembler;
     private final PagedResourcesAssembler<BugCommentResponseDto> bugCommentDtoPagedResourcesAssembler;
 
-    @GetMapping
+    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<PagedModel<EntityModel<BugResponseDto>>> getBugsPage(@PageableDefault(page = 0, size = 15) Pageable pageable) {
         Page<BugResponseDto> bugDtosPage = bugService.findAllBugs(pageable).map(bugDtoMapper::toDto);
         PagedModel<EntityModel<BugResponseDto>> bugDtosPagedModel = bugDtoPagedResourcesAssembler.toModel(bugDtosPage, bugDtoModelAssembler);
         return ResponseEntity.ok(bugDtosPagedModel);
     }
 
-    @GetMapping("{bugId}")
+    @GetMapping(path = "{bugId}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<BugResponseDto>> getBug(@PathVariable Long bugId) {
         BugResponseDto bug = bugDtoMapper.toDto(bugService.findBugById(bugId));
         EntityModel<BugResponseDto> bugDtoModel = bugDtoModelAssembler.toModel(bug);
         return ResponseEntity.ok(bugDtoModel);
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createBug(@Valid @RequestBody BugRequestDto bugRequestDto, @CurrentUser UserPrincipal currentUser) {
         Project project = projectService.findProjectById(bugRequestDto.projectId());
         Bug bug = bugService.createBug(project, bugRequestDto, currentUser.user());
@@ -67,7 +69,7 @@ public class BugController {
         return ResponseEntity.created(createdBugUri).build();
     }
 
-    @PatchMapping("{bugId}")
+    @PatchMapping(path = "{bugId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateBug(@PathVariable Long bugId, @Valid @RequestBody BugRequestDto bugRequestDto) {
         Bug bug = bugService.findBugById(bugId);
         bugService.updateBug(bug, bugRequestDto);
@@ -81,13 +83,14 @@ public class BugController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("{bugId}/comments")
+    @GetMapping(path = "{bugId}/comments", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<PagedModel<EntityModel<BugCommentResponseDto>>> getComments(
             @PathVariable Long bugId,
             @PageableDefault(page = 0, size = 15) Pageable pageable) {
         Bug bug = bugService.findBugById(bugId);
         Page<BugCommentResponseDto> commentDtosPage = bugCommentService.findAllCommentsByBug(bug, pageable).map(bugCommentDtoMapper::toDto);
-        PagedModel<EntityModel<BugCommentResponseDto>> commentDtosPagedModel = bugCommentDtoPagedResourcesAssembler.toModel(commentDtosPage, bugCommentDtoModelAssembler);
+        PagedModel<EntityModel<BugCommentResponseDto>> commentDtosPagedModel =
+                bugCommentDtoPagedResourcesAssembler.toModel(commentDtosPage, bugCommentDtoModelAssembler);
         return ResponseEntity.ok(commentDtosPagedModel);
     }
 }
