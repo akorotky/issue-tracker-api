@@ -81,21 +81,21 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createProject(@RequestBody ProjectRequestDto projectRequestDto, @CurrentUser UserPrincipal currentUser) {
+    public ResponseEntity<Void> createProject(@RequestBody ProjectRequestDto projectRequestDto, @CurrentUser UserPrincipal currentUser) {
         Project project = projectService.createProject(projectRequestDto, currentUser.user());
         URI createdProjectUri = linkTo(methodOn(ProjectController.class).getProject(project.getId())).toUri();
         return ResponseEntity.created(createdProjectUri).build();
     }
 
     @PatchMapping("{projectId}")
-    public ResponseEntity<?> updateProject(@RequestBody ProjectRequestDto projectRequestDto, @PathVariable Long projectId) {
+    public ResponseEntity<Void> updateProject(@RequestBody ProjectRequestDto projectRequestDto, @PathVariable Long projectId) {
         Project project = projectService.findProjectById(projectId);
         projectService.updateProject(project, projectRequestDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("{projectId}")
-    public ResponseEntity<?> deleteProject(@PathVariable Long projectId) {
+    public ResponseEntity<Void> deleteProject(@PathVariable Long projectId) {
         Project project = projectService.findProjectById(projectId);
         projectService.deleteProject(project);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -115,7 +115,7 @@ public class ProjectController {
     }
 
     @PutMapping("{projectId}/collaborators/{username}")
-    public ResponseEntity<?> addCollaborator(@PathVariable Long projectId, @PathVariable String username) {
+    public ResponseEntity<Void> addCollaborator(@PathVariable Long projectId, @PathVariable String username) {
         Project project = projectService.findProjectById(projectId);
         User collaborator = userService.findUserByUsername(username);
         projectService.addProjectCollaborator(project, collaborator);
@@ -123,7 +123,7 @@ public class ProjectController {
     }
 
     @DeleteMapping("{projectId}/collaborators/{username}")
-    public ResponseEntity<?> removeCollaborator(@PathVariable Long projectId, @PathVariable String username) {
+    public ResponseEntity<Void> removeCollaborator(@PathVariable Long projectId, @PathVariable String username) {
         Project project = projectService.findProjectById(projectId);
         User collaborator = userService.findUserByUsername(username);
         projectService.removeProjectCollaborator(project, collaborator);

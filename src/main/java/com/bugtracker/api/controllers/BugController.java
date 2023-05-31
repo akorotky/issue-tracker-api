@@ -60,7 +60,7 @@ public class BugController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createBug(@Valid @RequestBody BugRequestDto bugRequestDto, @CurrentUser UserPrincipal currentUser) {
+    public ResponseEntity<Void> createBug(@Valid @RequestBody BugRequestDto bugRequestDto, @CurrentUser UserPrincipal currentUser) {
         Project project = projectService.findProjectById(bugRequestDto.projectId());
         Bug bug = bugService.createBug(project, bugRequestDto, currentUser.user());
         URI createdBugUri = linkTo(methodOn(BugController.class).getBug(bug.getId())).toUri();
@@ -68,14 +68,14 @@ public class BugController {
     }
 
     @PatchMapping("{bugId}")
-    public ResponseEntity<?> updateBug(@PathVariable Long bugId, @Valid @RequestBody BugRequestDto bugRequestDto) {
+    public ResponseEntity<Void> updateBug(@PathVariable Long bugId, @Valid @RequestBody BugRequestDto bugRequestDto) {
         Bug bug = bugService.findBugById(bugId);
         bugService.updateBug(bug, bugRequestDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("{bugId}")
-    public ResponseEntity<?> deleteBug(@PathVariable Long bugId) {
+    public ResponseEntity<Void> deleteBug(@PathVariable Long bugId) {
         Bug bug = bugService.findBugById(bugId);
         bugService.deleteBug(bug);
         return new ResponseEntity<>(HttpStatus.OK);

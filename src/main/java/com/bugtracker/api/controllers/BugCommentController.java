@@ -53,7 +53,7 @@ public class BugCommentController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createBugComment(
+    public ResponseEntity<Void> createBugComment(
             @Valid @RequestBody BugCommentRequestDto bugCommentRequestDto,
             @CurrentUser UserPrincipal currentUser) {
         Bug bug = bugService.findBugById(bugCommentRequestDto.bugId());
@@ -63,14 +63,14 @@ public class BugCommentController {
     }
 
     @PatchMapping("{commentId}")
-    public ResponseEntity<?> updateBugComment(@PathVariable Long bugId, @Valid @RequestBody BugCommentRequestDto bugCommentRequestDto) {
+    public ResponseEntity<Void> updateBugComment(@PathVariable Long bugId, @Valid @RequestBody BugCommentRequestDto bugCommentRequestDto) {
         BugComment bugComment = bugCommentService.findBugCommentById(bugId);
         bugCommentService.updateBugComment(bugComment, bugCommentRequestDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("{commentId}")
-    public ResponseEntity<?> deleteBugComment(@PathVariable Long commentId) {
+    public ResponseEntity<Void> deleteBugComment(@PathVariable Long commentId) {
         BugComment bugComment = bugCommentService.findBugCommentById(commentId);
         bugCommentService.deleteBugComment(bugComment);
         return new ResponseEntity<>(HttpStatus.OK);

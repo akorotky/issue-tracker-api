@@ -47,7 +47,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
+    public ResponseEntity<Void> createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
         userService.createUser(userRequestDto);
         URI createdUserUri = linkTo(methodOn(UserController.class).getUser(userRequestDto.username())).toUri();
         return ResponseEntity.created(createdUserUri).build();
@@ -62,14 +62,14 @@ public class UserController {
     }
 
     @PatchMapping("{username}")
-    public ResponseEntity<?> updateUser(@PathVariable String username, @Valid @RequestBody UserRequestDto userRequestDto) {
+    public ResponseEntity<Void> updateUser(@PathVariable String username, @Valid @RequestBody UserRequestDto userRequestDto) {
         User user = userService.findUserByUsername(username);
         userService.updateUser(user, userRequestDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("{username}")
-    public ResponseEntity<?> deleteUser(@PathVariable String username) {
+    public ResponseEntity<Void> deleteUser(@PathVariable String username) {
         User user = userService.findUserByUsername(username);
         userService.deleteUser(user);
         return new ResponseEntity<>(HttpStatus.OK);

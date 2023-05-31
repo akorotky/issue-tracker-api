@@ -27,7 +27,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/token")
-    public ResponseEntity<?> refreshAccessToken(@RequestBody AccessTokenRequestDto accessTokenRequestDto) {
+    public ResponseEntity<AccessTokenResponseDto> refreshAccessToken(@RequestBody AccessTokenRequestDto accessTokenRequestDto) {
         String accessToken = authenticationService.refreshAccessToken(accessTokenRequestDto);
         return ResponseEntity.ok(new AccessTokenResponseDto(accessToken));
     }
