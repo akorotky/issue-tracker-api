@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@PostAuthorize("!returnObject.bug.project.isPrivate || hasPermission(#returnObject.bug.project, 'READ') || hasRole('ADMIN')")
+@PostAuthorize("!returnObject.bug.project.isPrivate || hasPermission(returnObject.bug.project, 'READ') || hasRole('ADMIN')")
 public @interface BugCommentReadByIdPermission {
 }
