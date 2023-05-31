@@ -23,7 +23,7 @@ CREATE TABLE "user" (
 CREATE TABLE project (
     id BIGSERIAL,
     title varchar(255) NOT NULL,
-    description TEXT NOT NULL,
+    description TEXT,
     private BOOLEAN NOT NULL,
     user_id BIGINT NOT NULL,
     created_date TIMESTAMP NOT NULL,
