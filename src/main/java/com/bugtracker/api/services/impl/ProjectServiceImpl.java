@@ -18,10 +18,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
 
@@ -92,7 +94,7 @@ public class ProjectServiceImpl implements ProjectService {
     @ProjectReadPermission
     @Override
     public List<User> getProjectCollaborators(Project project) {
-        List<User> collaborators = project.getCollaborators().stream().toList();
+        List<User> collaborators = project.getCollaboratorsView().stream().toList();
         if (collaborators.isEmpty())
             throw new ResourceNotFoundException("No collaborators for project with id=" + project.getId() + " found");
         return collaborators;
