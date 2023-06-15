@@ -5,6 +5,8 @@ import com.bugtracker.api.entities.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,7 +17,10 @@ import java.util.Set;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class User extends AuditMetadata {
+public class User extends AuditMetadata implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 32183128387521L;
 
     private Long id;
     private String username;

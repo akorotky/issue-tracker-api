@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.LastModifiedBy;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,7 +17,10 @@ import java.util.Set;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class Bug extends AuditMetadata {
+public class Bug extends AuditMetadata implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 849328404329398L;
 
     private Long id;
     private String title;

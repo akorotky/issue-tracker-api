@@ -4,6 +4,8 @@ import com.bugtracker.api.entities.audit.AuditMetadata;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,7 +16,10 @@ import java.util.Set;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class Project extends AuditMetadata {
+public class Project extends AuditMetadata implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 79432904259497L;
 
     private Long id;
     private String title;

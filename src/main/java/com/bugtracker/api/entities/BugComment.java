@@ -4,13 +4,19 @@ import com.bugtracker.api.entities.audit.AuditMetadata;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 @Entity
 @Table(name = "bug_comment")
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class BugComment extends AuditMetadata {
+public class BugComment extends AuditMetadata implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 874032472355232L;
 
     private Long id;
     private String body;

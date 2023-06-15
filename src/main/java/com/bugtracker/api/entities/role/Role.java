@@ -4,11 +4,17 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 @Entity
 @Table(name = "role")
 @Data
 @NoArgsConstructor
-public class Role {
+public class Role implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 53284053209365L;
 
     private Long id;
     private RoleType name;
