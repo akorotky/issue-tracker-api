@@ -4,45 +4,77 @@ import com.bugtracker.api.entities.audit.AuditMetadata;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "project")
-@Builder
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class Project extends AuditMetadata implements Serializable {
+public class Project extends AuditMetadata {
+
+    private Long id;
+    private String title;
+    private String description;
+    private Boolean isPrivate;
+    private User owner;
+    private Set<Bug> bugs = new HashSet<>();
+    private Set<User> collaborators = new HashSet<>();
 
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
-    private Long id;
+    public Long getId() {
+        return id;
+    }
 
     @Column(name = "title", nullable = false)
-    private String title;
+    public String getTitle() {
+        return title;
+    }
 
     @Column(name = "description")
-    private String description;
+    public String getDescription() {
+        return description;
+    }
 
     @Column(name = "private")
-    private Boolean isPrivate;
-
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Set<Bug> bugs = new HashSet<>();
+    public Boolean getIsPrivate() {
+        return isPrivate;
+    }
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
-    private User owner;
+    public User getOwner() {
+        return owner;
+    }
+
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<Bug> getBugs() {
+        return bugs;
+    }
+
+    @Transient
+    public Set<Bug> getBugsView() {
+        return Collections.unmodifiableSet(bugs);
+    }
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "project_user",
             joinColumns = {@JoinColumn(name = "project_id")},
             inverseJoinColumns = {@JoinColumn(name = "user_id")})
-    private Set<User> collaborators = new HashSet<>();
+    private Set<User> getCollaborators() {
+        return collaborators;
+    }
+
+    @Transient
+    public Set<User> getCollaboratorsView() {
+        return Collections.unmodifiableSet(collaborators);
+    }
 
     public void addCollaborator(User user) {
         collaborators.add(user);
@@ -52,31 +84,5 @@ public class Project extends AuditMetadata implements Serializable {
         collaborators.remove(user);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Project project = (Project) o;
-        return Objects.equals(id, project.id)
-                && Objects.equals(title, project.title)
-                && Objects.equals(description, project.description)
-                && Objects.equals(bugs, project.bugs)
-                && Objects.equals(owner, project.owner);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, title, description, owner);
-    }
-
-    @Override
-    public String toString() {
-        return "Project{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", owner=" + owner +
-                '}';
-    }
 }
 
