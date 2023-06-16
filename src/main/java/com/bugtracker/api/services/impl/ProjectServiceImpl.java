@@ -34,6 +34,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final Permission[] collaboratorPermissions = {BasePermission.READ, BasePermission.CREATE};
 
     @IsUser
+    @Transactional(readOnly = true)
     @Override
     public Page<Project> findAllProjects(Pageable pageable) {
         Page<Project> projects = projectRepository.findAll(pageable);
@@ -42,6 +43,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @IsUser
+    @Transactional(readOnly = true)
     @Override
     public Page<Project> findAllProjectsByOwner(User user, Pageable pageable) {
         Page<Project> projects = projectRepository.findByOwner(user, pageable);
@@ -51,6 +53,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @IsUser
+    @Transactional(readOnly = true)
     @Override
     public Page<Project> findAllProjectsByCollaborator(User user, Pageable pageable) {
         Page<Project> projects = projectRepository.findByCollaborator(user, pageable);
@@ -61,6 +64,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @IsUser
     @ProjectReadByIdPermission
+    @Transactional(readOnly = true)
     @Override
     public Project findProjectById(Long projectId) {
         return projectRepository.findById(projectId)

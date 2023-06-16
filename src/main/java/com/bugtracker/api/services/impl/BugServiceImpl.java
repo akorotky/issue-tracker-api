@@ -33,6 +33,7 @@ public class BugServiceImpl implements BugService {
     private final Permission[] bugAuthorPermissions = {BasePermission.ADMINISTRATION};
 
     @IsUser
+    @Transactional(readOnly = true)
     @Override
     public Page<Bug> findAllBugs(Pageable pageable) {
         Page<Bug> bugs = bugRepository.findAll(pageable);
@@ -41,6 +42,7 @@ public class BugServiceImpl implements BugService {
     }
 
     @ProjectReadPermission
+    @Transactional(readOnly = true)
     @Override
     public Page<Bug> findAllBugsByProject(Project project, Pageable pageable) {
         Page<Bug> bugs = bugRepository.findByProject(project, pageable);
@@ -51,6 +53,7 @@ public class BugServiceImpl implements BugService {
 
     @IsUser
     @BugReadByIdPermission
+    @Transactional(readOnly = true)
     @Override
     public Bug findBugById(Long bugId) {
         return bugRepository.findById(bugId).

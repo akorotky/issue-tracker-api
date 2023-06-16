@@ -33,6 +33,7 @@ public class BugCommentServiceImpl implements BugCommentService {
     private final Permission[] commentAuthorPermissions = {BasePermission.ADMINISTRATION};
 
     @IsUser
+    @Transactional(readOnly = true)
     @Override
     public Page<BugComment> findAllBugComments(Pageable pageable) {
         Page<BugComment> bugComments = bugCommentRepository.findAll(pageable);
@@ -42,6 +43,7 @@ public class BugCommentServiceImpl implements BugCommentService {
 
     @IsUser
     @BugCommentReadByIdPermission
+    @Transactional(readOnly = true)
     @Override
     public BugComment findBugCommentById(Long commentId) {
         return bugCommentRepository.findById(commentId).
@@ -49,6 +51,7 @@ public class BugCommentServiceImpl implements BugCommentService {
     }
 
     @BugReadPermission
+    @Transactional(readOnly = true)
     @Override
     public Page<BugComment> findAllCommentsByBug(Bug bug, Pageable pageable) {
         Page<BugComment> bugComments = bugCommentRepository.findByBug(bug, pageable);

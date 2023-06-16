@@ -41,6 +41,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final UserDtoMapper userDtoMapper;
 
+    @Transactional(readOnly = true)
     @Override
     public UserDetails loadUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
@@ -49,6 +50,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @IsUser
+    @Transactional(readOnly = true)
     @Override
     public Page<User> findAllUsers(Pageable pageable) {
         Page<User> users = userRepository.findAll(pageable);
@@ -57,6 +59,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @IsUser
+    @Transactional(readOnly = true)
     @Override
     public User findUserByUsername(String username) {
         return userRepository.findByUsername(username)
@@ -64,6 +67,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @IsUser
+    @Transactional(readOnly = true)
     @Override
     public User findUserById(Long userId) {
         return userRepository.findById(userId)
