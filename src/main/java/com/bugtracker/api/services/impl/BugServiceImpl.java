@@ -37,7 +37,7 @@ public class BugServiceImpl implements BugService {
     @Override
     public Page<Bug> findAllBugs(Pageable pageable) {
         Page<Bug> bugs = bugRepository.findAll(pageable);
-        if (bugs.getTotalElements() == 0) throw new ResourceNotFoundException("No bugs found");
+        if (bugs.isEmpty()) throw new ResourceNotFoundException("No bugs found");
         return bugs;
     }
 
@@ -46,7 +46,7 @@ public class BugServiceImpl implements BugService {
     @Override
     public Page<Bug> findAllBugsByProject(Project project, Pageable pageable) {
         Page<Bug> bugs = bugRepository.findByProject(project, pageable);
-        if (bugs.getTotalElements() == 0)
+        if (bugs.isEmpty())
             throw new ResourceNotFoundException("No bugs for project with id=" + project.getId() + " found");
         return bugs;
     }

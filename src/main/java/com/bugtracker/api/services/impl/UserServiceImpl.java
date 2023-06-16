@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public Page<User> findAllUsers(Pageable pageable) {
         Page<User> users = userRepository.findAll(pageable);
-        if (users.getTotalElements() == 0) throw new ResourceNotFoundException("No users found");
+        if (users.isEmpty()) throw new ResourceNotFoundException("No users found");
         return users;
     }
 

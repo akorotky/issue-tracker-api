@@ -38,7 +38,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Page<Project> findAllProjects(Pageable pageable) {
         Page<Project> projects = projectRepository.findAll(pageable);
-        if (projects.getTotalElements() == 0) throw new ResourceNotFoundException("No projects found");
+        if (projects.isEmpty()) throw new ResourceNotFoundException("No projects found");
         return projects;
     }
 
@@ -47,7 +47,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Page<Project> findAllProjectsByOwner(User user, Pageable pageable) {
         Page<Project> projects = projectRepository.findByOwner(user, pageable);
-        if (projects.getTotalElements() == 0)
+        if (projects.isEmpty())
             throw new ResourceNotFoundException("No projects with owner=" + user.getUsername() + " found");
         return projects;
     }
@@ -57,7 +57,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Page<Project> findAllProjectsByCollaborator(User user, Pageable pageable) {
         Page<Project> projects = projectRepository.findByCollaborator(user, pageable);
-        if (projects.getTotalElements() == 0)
+        if (projects.isEmpty())
             throw new ResourceNotFoundException("No projects with collaborator=" + user.getUsername() + " found");
         return projects;
     }

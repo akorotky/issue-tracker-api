@@ -37,7 +37,7 @@ public class BugCommentServiceImpl implements BugCommentService {
     @Override
     public Page<BugComment> findAllBugComments(Pageable pageable) {
         Page<BugComment> bugComments = bugCommentRepository.findAll(pageable);
-        if (bugComments.getTotalElements() == 0) throw new ResourceNotFoundException("No bug comments found");
+        if (bugComments.isEmpty()) throw new ResourceNotFoundException("No bug comments found");
         return bugComments;
     }
 
@@ -55,7 +55,7 @@ public class BugCommentServiceImpl implements BugCommentService {
     @Override
     public Page<BugComment> findAllCommentsByBug(Bug bug, Pageable pageable) {
         Page<BugComment> bugComments = bugCommentRepository.findByBug(bug, pageable);
-        if (bugComments.getTotalElements() == 0)
+        if (bugComments.isEmpty())
             throw new ResourceNotFoundException("No comments for bug with id=" + bug.getId() + " found");
         return bugComments;
     }
