@@ -1,20 +1,6 @@
-# About the Project
-Bugtracker is an open-source web application that enables developers to collaborate, manage projects, track bugs, and foster communication within their team. Conceptually inspired by the architectural design of GitHub, Bugtracker aims to deliver a robust platform where individuals and teams can plan, develop, and deliver software effectively. This project was developed for educational purposes, and serves to provide an example of what an enterprise-grade Java-based Spring Boot application with REST API for bug tracking might look like.
-
-# About This Repository
+# About 
 This repository contains the code for the backend of the full-stack Bugtracker project. <br>
 The frontend code can be found in the following [repository](https://github.com/skorotky/bugtracker-client).
-
-# Features (in-progress)
-Bugtracker offers a comprehensive set of features designed to optimize the software development lifecycle:
-
-* **Project Management:** Create and manage your software projects with ease. You can add or remove project collaborators and customize the project visibility, making your project visibile to users outside of your project, or making it private so that only the project owner and collaborators can see and access it. 
-
-* **Code Bug Tracking:** A built-in bug tracking system that allows users to report, track, and resolve bugs. Each bug report can be categorized, prioritized, and assigned to team members.
-
-* **Comments and Collaboration:** A collaborative space where team members can share their ideas, give feedback, and discuss project and bug specifics.
-
-* **Privacy and Security:** Required authentification and customizable fine-grained access control ensures that only certain types of users can interact with your projects, providing a high level of security and privacy. 
 
 # Technology Stack
 * **Languages**: Java 19
@@ -42,32 +28,11 @@ Bugtracker offers a comprehensive set of features designed to optimize the softw
   <li>Spring Security ACL</li>
 </ul>
 
-# API Components
-* REST API
+# API Features
+* RESTful CRUD API
 * Authentication & authorization (JWT)
+* Fine-grained resource access control
 * OpenAPI documentation with Swagger UI playground
-
-# Project Todos
-:white_check_mark: Enable user registration <br>
-:white_check_mark: Force user authentication & authorization (Json Web Token) <br>
-:white_check_mark: Allow users to create, update, and delete projects <br>
-:white_check_mark: Allow project owners to add and remove collaborators from their project <br>
-:white_check_mark: Allow the project owner and collaborators to create, update, and delete bug reports <br>
-:white_check_mark: Allow the project owner and collaborators to leave comments under bug reports and update/delete them <br>
-:white_check_mark: Enable resource pagination (to avoid fetching and displaying too much data at once) <br> 
-:white_check_mark: Add mock data
-:soon: Allow project owners to configure their project visibility (private vs. public) <br>
-:soon: Enable fine-grained access control based on user roles/privileges using ACL and Redis cache <br>
-:soon: Add proper error handling <br>
-:soon: Configure proper API response statuses <br>
-:soon: Configure proper media types for requests and responses
-:soon: Containerize the application using Docker <br>
-:soon: Allow JWT refresh tokens to be stored in cache <br>
-:soon: Configure CORS and CSRF <br>
-:soon: Configure user role hierarchy <br>
-:soon: Enable user logout <br>
-:soon: Enable full-text database search <br>
-:soon: Add unit & integration testing <br>
 
 # API Documentation 
 You can acess the OpenAPI Specification of the Bugtracker API in JSON format at http://localhost:8080/v3/api-docs. 
@@ -113,7 +78,56 @@ Example using curl: ```curl -X POST -H http://localhost:8080/api/auth/login "Con
 
 Access token is a short-lived Json Web Token (the token is valid only for 15 minutes) that you can put into the HTTP Authorization header when accessing the API, in order to avoid always sending username and password on every request. When the access token expires, you can use the refresh token (valid for 1 week) to generate a new access token by sending a POST request to the ```http://localhost:8080/api/auth/token``` endpoint with the refresh token in the request body.
 
-# RESTful API Example:
+# REST API 
+
+## Auth API
+| HTTP Method | URI | Description | 
+| ----------- | --- | ----------- |
+| POST        | /api/auth/login | Sign in |
+| POST        | /api/auth/token | Create and get an access + refresh token pair |
+
+## User API
+| HTTP Method | URI | Description | 
+| ----------- | --- | ----------- |
+| GET         | /api/users | Get all users |
+| POST        | /api/users | Create/register a user |
+| GET         | /api/users/{username} | Get user data | 
+| PATCH       | /api/users/{username} | Update user data | 
+| DELETE      | /api/users/{username} | Delete user | 
+
+## Project API
+| HTTP Method | URI | Description | 
+| ----------- | --- | ----------- |
+| GET         | /api/projects | Get all projects |
+| POST        | /api/projects | Create a project |
+| GET         | /api/projects/{projectId} | Get project data | 
+| PATCH       | /api/projects/{projectId} | Update project data | 
+| DELETE      | /api/projects/{projectId} | Delete project | 
+| DELETE      | /api/projects/{projectId}/bugs | Get project bugs | 
+| GET         | /api/projects/{projectId}/collaborators | Get project collaborators | 
+| PUT         | /api/projects/{projectId}/collaborators/{username} | Add a project collaborator | 
+| DELETE      | /api/projects/{projectId}/collaborators/{username} | Delete project collaborator | 
+
+## Bug API
+| HTTP Method | URI | Description | 
+| ----------- | --- | ----------- |
+| GET         | /api/bugs | Get all bugs |
+| POST        | /api/bugs | Create a bug |
+| GET         | /api/bugs/{bugId} | Get bug data | 
+| PATCH       | /api/bugs/{bugId} | Update bug | 
+| DELETE      | /api/bugs/{bugId} | Delete bug | 
+| GET         | /api/bugs/{bugId}/comments | Get bug comments | 
+
+## Comment API
+| HTTP Method | URI | Description | 
+| ----------- | --- | ----------- |
+| GET         | /api/comments | Get all comments |
+| POST        | /api/comments | Create a comment |
+| GET         | /api/comments/{commentId} | Get comment data | 
+| PATCH       | /api/comments/{commentId} | Update comment | 
+| DELETE      | /api/comments/{commentId} | Delete comment |  
+
+# RESTful Request/Response Example:
 
 #### Request:
 A GET request to ```http://localhost:8080/api/projects/1``` returns the project with an id of 1:
@@ -124,7 +138,7 @@ A GET request to ```http://localhost:8080/api/projects/1``` returns the project 
 {
     "id": 1,
     "title": "projectA",
-    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. A cras semper auctor neque vitae tempus quam pellentesque. Volutpat  consequat mauris nunc congue nisi vitae suscipit. Augue mauris augue neque gravida in. Tincidunt id aliquet risus feugiat in ante. Tellus at urna condimentum mattis pellentesque id nibh. Sed velit dignissim sodales ut eu sem integer. Ac tortor vitae purus faucibus ornare suspendisse sed. Aliquam vestibulum morbi blandit cursus risus. Pulvinar pellentesque habitant morbi tristique senectus. Etiam non quam lacus suspendisse faucibus interdum posuere. Tortor at auctor urna nunc id. Nisl rhoncus mattis rhoncus urna neque viverra justo nec ultrices.",
+    "description": "Lorem ipsum dolor sit amet, consectetur do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     "private": false,
     "owner": {
         "id": 1,
