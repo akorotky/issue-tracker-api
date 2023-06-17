@@ -99,6 +99,8 @@ Access token is a short-lived Json Web Token (the token is valid only for 15 min
 | HTTP Method | URI | Description | 
 | ----------- | --- | ----------- |
 | GET         | /api/projects | Get all projects |
+| GET         | /api/projects?user={username} | Get all projects where user is the owner |
+| GET         | /api/projects?collaborator={username} | Get all projects where user is a collaborator |
 | POST        | /api/projects | Create a project |
 | GET         | /api/projects/{projectId} | Get project data | 
 | PATCH       | /api/projects/{projectId} | Update project data | 
