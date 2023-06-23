@@ -1,6 +1,6 @@
 package com.bugtracker.api.security.acl;
 
-import com.bugtracker.api.entities.role.RoleType;
+import com.bugtracker.api.entity.role.RoleType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;

@@ -1,7 +1,7 @@
 package com.bugtracker.api.dto.user;
 
 import com.bugtracker.api.dto.role.RoleDtoMapper;
-import com.bugtracker.api.entities.User;
+import com.bugtracker.api.entity.User;
 import org.mapstruct.Mapper;
 
 @Mapper

@@ -1,6 +1,6 @@
 package com.bugtracker.api.security.principal;
 
-import com.bugtracker.api.entities.User;
+import com.bugtracker.api.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
