@@ -5,7 +5,7 @@ import com.bugtracker.api.dto.user.UserDtoMapper;
 import com.bugtracker.api.dto.user.UserRequestDto;
 import com.bugtracker.api.dto.user.UserResponseDto;
 import com.bugtracker.api.entity.User;
-import com.bugtracker.api.service.impl.UserServiceImpl;
+import com.bugtracker.api.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,7 +32,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
     private final RestModelAssembler<UserResponseDto> userDtoRestModelAssembler;
     private final PagedResourcesAssembler<UserResponseDto> userDtoPagedResourcesAssembler;
     private final UserDtoMapper userDtoMapper;
