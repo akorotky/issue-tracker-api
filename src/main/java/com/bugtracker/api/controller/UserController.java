@@ -8,7 +8,6 @@ import com.bugtracker.api.entity.User;
 import com.bugtracker.api.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -20,6 +19,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -30,6 +30,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 @RequestMapping("api/users")
 @RequiredArgsConstructor
+@Validated
 public class UserController {
 
     private final UserService userService;
@@ -39,19 +40,19 @@ public class UserController {
 
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<PagedModel<EntityModel<UserResponseDto>>> getUsersPage(
-            @PageableDefault(page = 0, size = 15)
+            @PageableDefault(size = 15)
             @SortDefault.SortDefaults({
                     @SortDefault(sort = "username", direction = Sort.Direction.DESC)
             }) Pageable pageable) {
-        Page<UserResponseDto> userDtosPage = userService.findAllUsers(pageable).map(userDtoMapper::toDto);
-        PagedModel<EntityModel<UserResponseDto>> userDtosPagedModel = userDtoPagedResourcesAssembler.toModel(userDtosPage, userDtoRestModelAssembler);
-        return ResponseEntity.ok(userDtosPagedModel);
+        var users = userService.findAllUsers(pageable).map(userDtoMapper::toDto);
+        var usersModel = userDtoPagedResourcesAssembler.toModel(users, userDtoRestModelAssembler);
+        return ResponseEntity.ok(usersModel);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
-        userService.createUser(userRequestDto);
-        URI createdUserUri = linkTo(methodOn(UserController.class).getUser(userRequestDto.username())).toUri();
+        String username = userService.createUser(userRequestDto).getUsername();
+        URI createdUserUri = linkTo(methodOn(UserController.class).getUser(username)).toUri();
         return ResponseEntity.created(createdUserUri).build();
     }
 
@@ -59,7 +60,7 @@ public class UserController {
     public ResponseEntity<EntityModel<UserResponseDto>> getUser(@PathVariable String username) {
         User user = userService.findUserByUsername(username);
         UserResponseDto userDto = userDtoMapper.toDto(user);
-        EntityModel<UserResponseDto> userDtoModel = userDtoRestModelAssembler.toModel(userDto);
+        var userDtoModel = userDtoRestModelAssembler.toModel(userDto);
         return ResponseEntity.ok(userDtoModel);
     }
 

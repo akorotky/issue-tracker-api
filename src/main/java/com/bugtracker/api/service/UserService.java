@@ -27,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -70,27 +71,23 @@ public class UserService implements UserDetailsService {
     }
 
     @IsAnonymousUser
-    public void createUser(UserRequestDto userRequestDto) {
+    public User createUser(UserRequestDto userRequestDto) {
         User user = userDtoMapper.toEntity(userRequestDto);
-
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findRoleByName(RoleType.USER)
                 .orElseThrow(() -> new ResourceNotFoundException("Role with name=" + RoleType.USER + " not found")));
-
         user.setRoles(roles);
         user.setAccountEnabled(true);
         user.setAccountLocked(false);
         user.setAccountExpired(false);
         user.setCredentialsExpired(false);
-
-        // set authentication in order for JPA auditing to work
-        UserPrincipal userPrincipal = new UserPrincipal(user);
-        Authentication auth = new UsernamePasswordAuthenticationToken(userPrincipal, null, userPrincipal.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        userRepository.save(user);
-        SecurityContextHolder.clearContext();
+        /*
+         Overrides an automatic field update by the JPA auditor,
+         so no pre-authentication is required
+         */
+        user.setCreatedDate(Instant.now());
+        return userRepository.saveAndFlush(user);
     }
 
     @UserAccountPermission
