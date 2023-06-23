@@ -11,12 +11,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AclPermissionService {
 
     private final MutableAclService mutableAclService;
 
-    @Transactional
     public void grantPermissions(Object object, Long objectId, String username, Permission... permissions) {
         ObjectIdentity objectIdentity = new ObjectIdentityImpl(object.getClass(), objectId);
         MutableAcl acl;
@@ -31,7 +31,6 @@ public class AclPermissionService {
         mutableAclService.updateAcl(acl);
     }
 
-    @Transactional
     public void revokePermissions(Object object, Long objectId, String username, Permission... permissions) {
         ObjectIdentity objectIdentity = new ObjectIdentityImpl(object.getClass(), objectId);
         MutableAcl acl;
