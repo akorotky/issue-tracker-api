@@ -22,6 +22,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -32,6 +33,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 @RequestMapping("api/comments")
 @RequiredArgsConstructor
+@Validated
 public class BugCommentController {
 
     private final BugCommentService bugCommentService;
@@ -41,16 +43,16 @@ public class BugCommentController {
     private final BugCommentDtoMapper bugCommentDtoMapper;
 
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
-    public ResponseEntity<PagedModel<EntityModel<BugCommentResponseDto>>> getBugCommentsPage(@PageableDefault(page = 0, size = 15) Pageable pageable) {
-        Page<BugCommentResponseDto> commentDtosPage = bugCommentService.findAllBugComments(pageable).map(bugCommentDtoMapper::toDto);
-        PagedModel<EntityModel<BugCommentResponseDto>> commentDtosPagedModel = bugCommentDtoPagedResourcesAssembler.toModel(commentDtosPage, bugCommentDtoRestModelAssembler);
+    public ResponseEntity<PagedModel<EntityModel<BugCommentResponseDto>>> getBugCommentsPage(@PageableDefault(size = 15) Pageable pageable) {
+        var commentDtosPage = bugCommentService.findAllBugComments(pageable).map(bugCommentDtoMapper::toDto);
+        var commentDtosPagedModel = bugCommentDtoPagedResourcesAssembler.toModel(commentDtosPage, bugCommentDtoRestModelAssembler);
         return ResponseEntity.ok(commentDtosPagedModel);
     }
 
     @GetMapping(path = "{commentId}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<BugCommentResponseDto>> getBugComment(@PathVariable Long commentId) {
         BugCommentResponseDto bugCommentDto = bugCommentDtoMapper.toDto(bugCommentService.findBugCommentById(commentId));
-        EntityModel<BugCommentResponseDto> bugCommentDtoModel = bugCommentDtoRestModelAssembler.toModel(bugCommentDto);
+        var bugCommentDtoModel = bugCommentDtoRestModelAssembler.toModel(bugCommentDto);
         return ResponseEntity.ok(bugCommentDtoModel);
     }
 
@@ -59,8 +61,8 @@ public class BugCommentController {
             @Valid @RequestBody BugCommentRequestDto bugCommentRequestDto,
             @CurrentUser UserPrincipal currentUser) {
         Bug bug = bugService.findBugById(bugCommentRequestDto.bugId());
-        BugComment bugComment = bugCommentService.createBugComment(bug, bugCommentRequestDto, currentUser.user());
-        URI createdBugCommentUri = linkTo(methodOn(BugCommentController.class).getBugComment(bugComment.getId())).toUri();
+        Long bugCommentId = bugCommentService.createBugComment(bug, bugCommentRequestDto, currentUser.user()).getId();
+        URI createdBugCommentUri = linkTo(methodOn(BugCommentController.class).getBugComment(bugCommentId)).toUri();
         return ResponseEntity.created(createdBugCommentUri).build();
     }
 

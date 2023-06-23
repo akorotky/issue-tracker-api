@@ -30,7 +30,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -56,7 +55,7 @@ public class ProjectController {
     public ResponseEntity<PagedModel<EntityModel<ProjectResponseDto>>> getProjectsPage(
             @RequestParam(required = false) String owner,
             @RequestParam(required = false) String collaborator,
-            @PageableDefault(page = 0, size = 20) Pageable pageable) {
+            @PageableDefault(size = 20) Pageable pageable) {
         Page<Project> projectsPage;
         User user;
 
@@ -69,8 +68,8 @@ public class ProjectController {
             user = userService.findUserByUsername(collaborator);
             projectsPage = projectService.findAllProjectsByCollaborator(user, pageable);
         }
-        Page<ProjectResponseDto> projectDtosPage = projectsPage.map(projectDtoMapper::toDto);
-        PagedModel<EntityModel<ProjectResponseDto>> projectDtosPagedModel = projectDtoPagedResourcesAssembler.toModel(projectDtosPage, projectDtoRestModelAssembler);
+        var projectDtosPage = projectsPage.map(projectDtoMapper::toDto);
+        var projectDtosPagedModel = projectDtoPagedResourcesAssembler.toModel(projectDtosPage, projectDtoRestModelAssembler);
         return ResponseEntity.ok(projectDtosPagedModel);
     }
 
@@ -78,14 +77,14 @@ public class ProjectController {
     public ResponseEntity<EntityModel<ProjectResponseDto>> getProject(@PathVariable Long projectId) {
         Project project = projectService.findProjectById(projectId);
         ProjectResponseDto projectDto = projectDtoMapper.toDto(project);
-        EntityModel<ProjectResponseDto> projectDtoModel = projectDtoRestModelAssembler.toModel(projectDto);
+        var projectDtoModel = projectDtoRestModelAssembler.toModel(projectDto);
         return ResponseEntity.ok(projectDtoModel);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createProject(@RequestBody ProjectRequestDto projectRequestDto, @CurrentUser UserPrincipal currentUser) {
-        Project project = projectService.createProject(projectRequestDto, currentUser.user());
-        URI createdProjectUri = linkTo(methodOn(ProjectController.class).getProject(project.getId())).toUri();
+        Long projectId = projectService.createProject(projectRequestDto, currentUser.user()).getId();
+        URI createdProjectUri = linkTo(methodOn(ProjectController.class).getProject(projectId)).toUri();
         return ResponseEntity.created(createdProjectUri).build();
     }
 
@@ -106,12 +105,11 @@ public class ProjectController {
     @GetMapping(path = "{projectId}/collaborators", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<CollectionModel<EntityModel<UserResponseDto>>> getAllCollaborators(@PathVariable Long projectId) {
         Project project = projectService.findProjectById(projectId);
-        List<EntityModel<UserResponseDto>> collaboratorDtoList = projectService.getProjectCollaborators(project).stream()
+        var collaboratorDtoList = projectService.getProjectCollaborators(project).stream()
                 .map(userDtoMapper::toDto)
                 .map(userDtoRestModelAssembler::toModel)
                 .toList();
-
-        CollectionModel<EntityModel<UserResponseDto>> collaboratorDtoListModel = CollectionModel.of(collaboratorDtoList);
+        var collaboratorDtoListModel = CollectionModel.of(collaboratorDtoList);
         collaboratorDtoListModel.add(linkTo(methodOn(ProjectController.class).getAllCollaborators(projectId)).withSelfRel());
         return ResponseEntity.ok(collaboratorDtoListModel);
     }
@@ -135,10 +133,10 @@ public class ProjectController {
     @GetMapping(path = "{projectId}/bugs", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<PagedModel<EntityModel<BugResponseDto>>> getAllBugs(
             @PathVariable Long projectId,
-            @PageableDefault(page = 0, size = 15) Pageable pageable) {
+            @PageableDefault(size = 15) Pageable pageable) {
         Project project = projectService.findProjectById(projectId);
-        Page<BugResponseDto> bugDtosPage = bugService.findAllBugsByProject(project, pageable).map(bugDtoMapper::toDto);
-        PagedModel<EntityModel<BugResponseDto>> bugDtosPagedModel = bugDtoPagedResourcesAssembler.toModel(bugDtosPage, bugDtoRestModelAssembler);
+        var bugDtosPage = bugService.findAllBugsByProject(project, pageable).map(bugDtoMapper::toDto);
+        var bugDtosPagedModel = bugDtoPagedResourcesAssembler.toModel(bugDtosPage, bugDtoRestModelAssembler);
         return ResponseEntity.ok(bugDtosPagedModel);
     }
 }
