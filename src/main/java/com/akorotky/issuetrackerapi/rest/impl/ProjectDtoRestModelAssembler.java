@@ -24,6 +24,6 @@ public class ProjectDtoRestModelAssembler implements RestModelAssembler<ProjectR
                 linkTo(methodOn(ProjectController.class).getProject(projectId)).withSelfRel(),
                 linkTo(methodOn(UserController.class).getUser(username)).withRel("owner"),
                 linkTo(methodOn(ProjectController.class).getAllCollaborators(projectId)).withRel("collaborators"),
-                linkTo(methodOn(ProjectController.class).getAllBugs(projectId, Pageable.unpaged())).withRel("bugs"));
+                linkTo(methodOn(ProjectController.class).getAllIssues(projectId, Pageable.unpaged())).withRel("issues"));
     }
 }

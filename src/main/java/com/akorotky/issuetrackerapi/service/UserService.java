@@ -2,7 +2,7 @@ package com.akorotky.issuetrackerapi.service;
 
 import com.akorotky.issuetrackerapi.dto.user.UserDtoMapper;
 import com.akorotky.issuetrackerapi.dto.user.UserRequestDto;
-import com.akorotky.issuetrackerapi.entity.Bug;
+import com.akorotky.issuetrackerapi.entity.Issue;
 import com.akorotky.issuetrackerapi.entity.Project;
 import com.akorotky.issuetrackerapi.entity.User;
 import com.akorotky.issuetrackerapi.entity.role.Role;
@@ -98,8 +98,8 @@ public class UserService implements UserDetailsService {
             project.removeCollaborator(user);
         }
 
-        for (Bug bug : user.getBugsView()) {
-            bug.setAuthor(null);
+        for (Issue issue : user.getIssuesView()) {
+            issue.setAuthor(null);
         }
 
         userRepository.deleteById(user.getId());

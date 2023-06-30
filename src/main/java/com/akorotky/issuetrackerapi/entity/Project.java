@@ -26,7 +26,7 @@ public class Project extends AuditMetadata implements Serializable {
     private String description;
     private Boolean isPrivate;
     private User owner;
-    private Set<Bug> bugs = new HashSet<>();
+    private Set<Issue> issues = new HashSet<>();
     private Set<User> collaborators = new HashSet<>();
 
     @Id
@@ -59,13 +59,13 @@ public class Project extends AuditMetadata implements Serializable {
     }
 
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Set<Bug> getBugs() {
-        return bugs;
+    private Set<Issue> getIssues() {
+        return issues;
     }
 
     @Transient
-    public Set<Bug> getBugsView() {
-        return Collections.unmodifiableSet(bugs);
+    public Set<Issue> getIssuesView() {
+        return Collections.unmodifiableSet(issues);
     }
 
     @ManyToMany(fetch = FetchType.LAZY)

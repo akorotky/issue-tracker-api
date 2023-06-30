@@ -8,12 +8,12 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "bug_comment")
+@Table(name = "comment")
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class BugComment extends AuditMetadata implements Serializable {
+public class Comment extends AuditMetadata implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 874032472355232L;
@@ -21,7 +21,7 @@ public class BugComment extends AuditMetadata implements Serializable {
     private Long id;
     private String body;
     private User author;
-    private Bug bug;
+    private Issue issue;
 
     @Id
     @EqualsAndHashCode.Include
@@ -43,9 +43,9 @@ public class BugComment extends AuditMetadata implements Serializable {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bug_id", updatable = false)
-    public Bug getBug() {
-        return bug;
+    @JoinColumn(name = "issue_id", updatable = false)
+    public Issue getIssue() {
+        return issue;
     }
 
 }

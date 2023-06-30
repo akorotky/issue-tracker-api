@@ -2,9 +2,9 @@ package com.akorotky.issuetrackerapi.rest.impl;
 
 import com.akorotky.issuetrackerapi.controller.UserController;
 import com.akorotky.issuetrackerapi.rest.RestModelAssembler;
-import com.akorotky.issuetrackerapi.controller.BugController;
+import com.akorotky.issuetrackerapi.controller.IssueController;
 import com.akorotky.issuetrackerapi.controller.ProjectController;
-import com.akorotky.issuetrackerapi.dto.bug.BugResponseDto;
+import com.akorotky.issuetrackerapi.dto.issue.IssueResponseDto;
 import lombok.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
@@ -14,18 +14,18 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
-public class BugDtoRestModelAssembler implements RestModelAssembler<BugResponseDto> {
+public class IssueDtoRestModelAssembler implements RestModelAssembler<IssueResponseDto> {
 
     @Override
-    public @NonNull EntityModel<BugResponseDto> toModel(BugResponseDto bugResponseDto) {
-        Long bugId = bugResponseDto.id();
-        String username = bugResponseDto.author().username();
-        Long projectId = bugResponseDto.projectId();
+    public @NonNull EntityModel<IssueResponseDto> toModel(IssueResponseDto issueResponseDto) {
+        Long issueId = issueResponseDto.id();
+        String username = issueResponseDto.author().username();
+        Long projectId = issueResponseDto.projectId();
 
-        return EntityModel.of(bugResponseDto,
-                linkTo(methodOn(BugController.class).getBug(bugId)).withSelfRel(),
+        return EntityModel.of(issueResponseDto,
+                linkTo(methodOn(IssueController.class).getIssue(issueId)).withSelfRel(),
                 linkTo(methodOn(UserController.class).getUser(username)).withRel("author"),
                 linkTo(methodOn(ProjectController.class).getProject(projectId)).withRel("project"),
-                linkTo(methodOn(BugController.class).getComments(bugId, Pageable.unpaged())).withRel("comments").expand());
+                linkTo(methodOn(IssueController.class).getIssueComments(issueId, Pageable.unpaged())).withRel("comments").expand());
     }
 }

@@ -1,4 +1,4 @@
-package com.akorotky.issuetrackerapi.security.expressions.permissions.bugcomment;
+package com.akorotky.issuetrackerapi.security.expressions.permissions.comment;
 
 import org.springframework.security.access.prepost.PostAuthorize;
 
@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@PostAuthorize("!returnObject.bug.project.isPrivate || hasPermission(returnObject.bug.project, 'READ') || hasRole('ADMIN')")
-public @interface BugCommentReadByIdPermission {
+@PostAuthorize("!returnObject.issue.project.isPrivate || hasPermission(returnObject.issue.project, 'READ') || hasRole('ADMIN')")
+public @interface CommentReadByIdPermission {
 }

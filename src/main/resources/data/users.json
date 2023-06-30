@@ -2,51 +2,51 @@
   {
     "username": "user",
     "password": "password",
-    "email": "user@bugtracker.test"
+    "email": "user@issuetracker.test"
   },
   {
     "username": "lex",
     "password": "lex12345",
-    "email": "lex@bugtracker.test"
+    "email": "lex@issuetracker.test"
   },
   {
     "username": "bob",
     "password": "bob12345",
-    "email": "bob@bugtracker.test"
+    "email": "bob@issuetracker.test"
   },
   {
     "username": "tom",
     "password": "tom12345",
-    "email": "tom@bugtracker.test"
+    "email": "tom@issuetracker.test"
   },
   {
     "username": "smith",
     "password": "smith12345",
-    "email": "smith@bugtracker.test"
+    "email": "smith@issuetracker.test"
   },
   {
     "username": "jack",
     "password": "jack12345",
-    "email": "jack@bugtracker.test"
+    "email": "jack@issuetracker.test"
   },
   {
     "username": "john",
     "password": "john12345",
-    "email": "john@bugtracker.test"
+    "email": "john@issuetracker.test"
   },
   {
     "username": "jim",
     "password": "jim12345",
-    "email": "jim@bugtracker.test"
+    "email": "jim@issuetracker.test"
   },
   {
     "username": "joe",
     "password": "joe12345",
-    "email": "user@bugtracker.test"
+    "email": "user@issuetracker.test"
   },
   {
     "username": "sam",
     "password": "sam12345",
-    "email": "sam@bugtracker.test"
+    "email": "sam@issuetracker.test"
   }
 ]

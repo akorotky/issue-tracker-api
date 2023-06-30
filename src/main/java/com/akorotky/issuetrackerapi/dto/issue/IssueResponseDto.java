@@ -1,10 +1,10 @@
-package com.akorotky.issuetrackerapi.dto.bug;
+package com.akorotky.issuetrackerapi.dto.issue;
 
 import com.akorotky.issuetrackerapi.dto.user.UserResponseDto;
 import org.springframework.hateoas.server.core.Relation;
 
-@Relation(collectionRelation = "bugs", itemRelation = "bug")
-public record BugResponseDto(
+@Relation(collectionRelation = "issues", itemRelation = "issue")
+public record IssueResponseDto(
         Long id,
         String title,
         String description,

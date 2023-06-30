@@ -8,11 +8,11 @@
         <version>3.0.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.bugtracker</groupId>
-    <artifactId>api</artifactId>
+    <groupId>com.akorotky</groupId>
+    <artifactId>issuetrackerapi</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>bugtracker-api</name>
-    <description>A REST API for the bugtracker project</description>
+    <name>issue-tracker-api</name>
+    <description>RESTful API for project collaboration and issue tracking</description>
     <properties>
         <java.version>19</java.version>
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>

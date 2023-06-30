@@ -12,12 +12,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "bug")
+@Table(name = "issue")
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class Bug extends AuditMetadata implements Serializable {
+public class Issue extends AuditMetadata implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 849328404329398L;
@@ -28,7 +28,7 @@ public class Bug extends AuditMetadata implements Serializable {
     private User author;
     private Project project;
     private Long modifiedBy;
-    private Set<BugComment> comments = new HashSet<>();
+    private Set<Comment> comments = new HashSet<>();
 
     @Id
     @EqualsAndHashCode.Include
@@ -66,13 +66,13 @@ public class Bug extends AuditMetadata implements Serializable {
         return modifiedBy;
     }
 
-    @OneToMany(mappedBy = "bug", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Set<BugComment> getComments() {
+    @OneToMany(mappedBy = "issue", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<Comment> getComments() {
         return comments;
     }
 
     @Transient
-    public Set<BugComment> getCommentsView() {
+    public Set<Comment> getCommentsView() {
         return Collections.unmodifiableSet(comments);
     }
 

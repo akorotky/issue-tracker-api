@@ -1,6 +1,6 @@
 package com.akorotky.issuetrackerapi.controller;
 
-import com.akorotky.issuetrackerapi.dto.bug.BugDtoMapper;
+import com.akorotky.issuetrackerapi.dto.issue.IssueDtoMapper;
 import com.akorotky.issuetrackerapi.dto.project.ProjectDtoMapper;
 import com.akorotky.issuetrackerapi.dto.project.ProjectRequestDto;
 import com.akorotky.issuetrackerapi.dto.project.ProjectResponseDto;
@@ -11,10 +11,10 @@ import com.akorotky.issuetrackerapi.entity.User;
 import com.akorotky.issuetrackerapi.rest.RestModelAssembler;
 import com.akorotky.issuetrackerapi.security.principal.CurrentUser;
 import com.akorotky.issuetrackerapi.security.principal.UserPrincipal;
-import com.akorotky.issuetrackerapi.service.BugService;
+import com.akorotky.issuetrackerapi.service.IssueService;
 import com.akorotky.issuetrackerapi.service.ProjectService;
 import com.akorotky.issuetrackerapi.service.UserService;
-import com.akorotky.issuetrackerapi.dto.bug.BugResponseDto;
+import com.akorotky.issuetrackerapi.dto.issue.IssueResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,15 +41,15 @@ public class ProjectController {
 
     private final ProjectService projectService;
     private final UserService userService;
-    private final BugService bugService;
-    private final BugDtoMapper bugDtoMapper;
+    private final IssueService issueService;
+    private final IssueDtoMapper issueDtoMapper;
     private final UserDtoMapper userDtoMapper;
     private final ProjectDtoMapper projectDtoMapper;
     private final RestModelAssembler<ProjectResponseDto> projectDtoRestModelAssembler;
     private final RestModelAssembler<UserResponseDto> userDtoRestModelAssembler;
-    private final RestModelAssembler<BugResponseDto> bugDtoRestModelAssembler;
+    private final RestModelAssembler<IssueResponseDto> issueDtoRestModelAssembler;
     private final PagedResourcesAssembler<ProjectResponseDto> projectDtoPagedResourcesAssembler;
-    private final PagedResourcesAssembler<BugResponseDto> bugDtoPagedResourcesAssembler;
+    private final PagedResourcesAssembler<IssueResponseDto> issueDtoPagedResourcesAssembler;
 
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<PagedModel<EntityModel<ProjectResponseDto>>> getProjectsPage(
@@ -130,13 +130,13 @@ public class ProjectController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(path = "{projectId}/bugs", produces = MediaTypes.HAL_JSON_VALUE)
-    public ResponseEntity<PagedModel<EntityModel<BugResponseDto>>> getAllBugs(
+    @GetMapping(path = "{projectId}/issues", produces = MediaTypes.HAL_JSON_VALUE)
+    public ResponseEntity<PagedModel<EntityModel<IssueResponseDto>>> getAllIssues(
             @PathVariable Long projectId,
             @PageableDefault(size = 15) Pageable pageable) {
         Project project = projectService.findProjectById(projectId);
-        var bugDtosPage = bugService.findAllBugsByProject(project, pageable).map(bugDtoMapper::toDto);
-        var bugDtosPagedModel = bugDtoPagedResourcesAssembler.toModel(bugDtosPage, bugDtoRestModelAssembler);
-        return ResponseEntity.ok(bugDtosPagedModel);
+        var issueDtos = issueService.findAllIssuesByProject(project, pageable).map(issueDtoMapper::toDto);
+        var issueDtosdModel = issueDtoPagedResourcesAssembler.toModel(issueDtos, issueDtoRestModelAssembler);
+        return ResponseEntity.ok(issueDtosdModel);
     }
 }

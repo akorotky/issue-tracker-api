@@ -1,8 +1,8 @@
 DROP TABLE IF EXISTS "user" CASCADE;
 DROP TABLE IF EXISTS project CASCADE;
 DROP TABLE IF EXISTS project_user CASCADE;
-DROP TABLE IF EXISTS bug CASCADE;
-DROP TABLE IF EXISTS bug_comment CASCADE;
+DROP TABLE IF EXISTS issue CASCADE;
+DROP TABLE IF EXISTS comment CASCADE;
 DROP TABLE IF EXISTS role CASCADE;
 DROP TABLE IF EXISTS user_role CASCADE;
 
@@ -42,7 +42,7 @@ CREATE TABLE project_user (
     CONSTRAINT fk_user_project_user FOREIGN KEY (user_id) REFERENCES "user"(id)
 );
 
-CREATE TABLE bug (
+CREATE TABLE issue (
     id BIGSERIAL,
     title varchar(255) NOT NULL,
     description TEXT,
@@ -52,20 +52,20 @@ CREATE TABLE bug (
     modified_date TIMESTAMP NOT NULL,
     modified_by BIGINT NOT NULL,
     PRIMARY KEY (id),
-    CONSTRAINT fk_user_bug FOREIGN KEY (user_id) REFERENCES "user"(id),
-    CONSTRAINT fk_project_bug FOREIGN KEY (project_id) REFERENCES project(id)
+    CONSTRAINT fk_user_issue FOREIGN KEY (user_id) REFERENCES "user"(id),
+    CONSTRAINT fk_project_issue FOREIGN KEY (project_id) REFERENCES project(id)
 );
 
-CREATE TABLE bug_comment (
+CREATE TABLE comment (
     id BIGSERIAL,
     body TEXT NOT NULL,
     user_id BIGINT NOT NULL,
-    bug_id BIGINT NOT NULL,
+    issue_id BIGINT NOT NULL,
     created_date TIMESTAMP NOT NULL,
     modified_date TIMESTAMP NOT NULL,
     PRIMARY KEY (id),
-    CONSTRAINT fk_user_bug_comment FOREIGN KEY (user_id) REFERENCES "user"(id),
-    CONSTRAINT fk_bug_bug_comment FOREIGN KEY (bug_id) REFERENCES bug(id)
+    CONSTRAINT fk_user_comment FOREIGN KEY (user_id) REFERENCES "user"(id),
+    CONSTRAINT fk_issue_comment FOREIGN KEY (issue_id) REFERENCES issue(id)
 );
 
 CREATE TABLE role (
