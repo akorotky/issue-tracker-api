@@ -28,6 +28,7 @@ public class DataSourcePopulator implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final ProjectService projectService;
     private final AuthenticationService authenticationService;
+    private final ObjectMapper objectMapper;
 
     private void initRoles() {
         RoleType[] roles = {RoleType.USER, RoleType.ADMIN};
@@ -66,9 +67,6 @@ public class DataSourcePopulator implements CommandLineRunner {
         // json data file locations
         String PROJECTS_DATA_LOCATION = "src/main/resources/data/projects.json";
         String USERS_DATA_LOCATION = "src/main/resources/data/users.json";
-
-        // initialize Jackson object mapper
-        ObjectMapper objectMapper = new ObjectMapper();
 
         // load data from the json files into DTOs
         List<UserRequestDto> userRequestDtoList = objectMapper.readValue(
